@@ -1,0 +1,87 @@
+package simpleApp
+
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+import org.apache.spark.SparkConf
+
+
+object example {
+    def main(args: Array[String]) {
+      val logFile = "/home/sushantnigudkar/Desktop/spark-testing-prep/access-code.txt" // Should be some file on your system
+      val conf = new SparkConf().setAppName("Simple Application").setMaster("local[*]")
+      val sc = new SparkContext(conf)
+      val logData = sc.textFile(logFile, 2).cache()
+      val numAs = logData.filter(line => line.contains("a")).count()
+      val numBs = logData.filter(line => line.contains("b")).count()
+      println("Lines with a: %s, Lines with b: %s".format(numAs, numBs))
+  }
+    
+}
+
+=========================================================================================================================
+
+
+package simpleApp
+
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+
+
+object example {
+  def main(args: Array[String]) {
+    val sc = SparkSession.builder().appName("app_name").master("local[*]").getOrCreate()
+    val df = sc.read
+    .format("csv")
+    .option("header","true")
+    .option("inferSchema","true") 
+    .option("delimiter",";")
+    .load("/home/sushantnigudkar/Desktop/spark-testing-prep/access-code.csv")
+    
+    df.show()
+    
+}
+  }
+
+==========================================================================================================================
+
+
+package example
+
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.streaming._
+import org.apache.spark.streaming.kafka._
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
+
+object simpleApp {
+  def main(args: Array[String]) {
+    
+    Logger.getLogger("org").setLevel(Level.OFF)
+    Logger.getLogger("akka").setLevel(Level.OFF)
+    
+    println("program started")
+    
+    val sc = SparkSession.builder().appName("app_name").master("local[*]").getOrCreate()
+    val df = sc
+      .read
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "192.168.0.19:9092")
+      .option("subscribe", "searce")
+      .load()
+     df.show()
+    
+//    val conf = new SparkConf().setMaster("local[*]").setAppName("kafkar")
+//    val ssc = new StreamingContext(conf, Seconds(2))
+//    val kafkaStreams = KafkaUtils.createStream(ssc, "192.168.0.19:2181","sscg",Map("searce" -> 5))
+//    kafkaStreams.print()
+//    ssc.start
+//    ssc.awaitTermination()
+
+  }
+}

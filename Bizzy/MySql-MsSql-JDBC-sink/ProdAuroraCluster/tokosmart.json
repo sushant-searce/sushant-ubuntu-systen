@@ -1,0 +1,27 @@
+{
+  "name": "prod-aurora-cluster-mysql-jdbc-mssqlV1",
+  "config":{
+        "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+        "tasks.max": "3",
+        "database.history.kafka.topic": "prod-aurora-cluster-mysql-jdbc-mssql-schemaV1",
+        "database.whitelist": "crowdSysProd",
+        "table.whitelist": "crowdSysProd.customer,crowdSysProd.customer_address,crowdSysProd.customer_ext_info,crowdSysProd.customer_order,crowdSysProd.order_billing,crowdSysProd.order_billing_detail,crowdSysProd.order_detail,crowdSysProd.product,crowdSysProd.product_price,crowdSysProd.va_payment,crowdSysProd.va_payment_detail,crowdSysProd.customer_deposit_history",
+        "database.user": "debezium",
+        "database.server.id": "200",
+        "database.history.kafka.bootstrap.servers": "b-3.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-1.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-2.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092",
+        "database.server.name": "mysql-prod-aurora-mssqlV1",
+        "database.port": "3306",
+        "database.hostname": "prod-auroradb-20200207.cegtg4k2vzhm.ap-southeast-1.rds.amazonaws.com",
+        "database.password": "G23eN0ff1CeP@rK678",
+        "transforms": "unwrap",
+        "transforms.unwrap.type": "io.debezium.transforms.UnwrapFromEnvelope",
+        "transforms.unwrap.drop.tombstones": "true",
+        "transforms.unwrap.operation.header": "true",
+        "transforms.unwrap.add.source.fields": "ts_ms",
+        "transforms.unwrap.delete.handling.mode":"rewrite",
+        "decimal.handling.mode": "string",
+        "time.precision.mode": "connect",
+	"snapshot.mode": "initial",
+	"snapshot.locking.mode": "none"
+  }
+}

@@ -1,0 +1,223 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/nodejs', '/usr/bin/npm', 'install', 'oracledb' ]
+2 info using npm@3.5.2
+3 info using node@v4.2.6
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData oracledb
+8 silly fetchNamedPackageData oracledb
+9 silly mapToRegistry name oracledb
+10 silly mapToRegistry using default registry
+11 silly mapToRegistry registry https://registry.npmjs.org/
+12 silly mapToRegistry uri https://registry.npmjs.org/oracledb
+13 verbose request uri https://registry.npmjs.org/oracledb
+14 verbose request no auth needed
+15 info attempt registry request try #1 at 12:13:35 PM
+16 verbose request id 4cd26a38c143d0af
+17 verbose etag W/"969b0bc4374c874f25d56ee6071a3530"
+18 verbose lastModified Mon, 19 Aug 2019 04:18:26 GMT
+19 http request GET https://registry.npmjs.org/oracledb
+20 http 304 https://registry.npmjs.org/oracledb
+21 verbose headers { date: 'Fri, 01 Nov 2019 06:43:34 GMT',
+21 verbose headers   connection: 'keep-alive',
+21 verbose headers   'set-cookie': [ '__cfduid=dc673bc5ed98921d452296b334e594c981572590614; expires=Sat, 31-Oct-20 06:43:34 GMT; path=/; domain=.npmjs.org; HttpOnly' ],
+21 verbose headers   'cf-cache-status': 'HIT',
+21 verbose headers   'cache-control': 'max-age=300',
+21 verbose headers   'cf-ray': '52ebe52d1e4bdcba-SIN',
+21 verbose headers   age: '99',
+21 verbose headers   etag: '"969b0bc4374c874f25d56ee6071a3530"',
+21 verbose headers   'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+21 verbose headers   'last-modified': 'Mon, 19 Aug 2019 04:18:26 GMT',
+21 verbose headers   vary: 'accept-encoding, accept',
+21 verbose headers   'x-amz-meta-rev': '98-0896ce6fda40ab55ea877531ff8cdc93',
+21 verbose headers   server: 'cloudflare' }
+22 silly get cb [ 304,
+22 silly get   { date: 'Fri, 01 Nov 2019 06:43:34 GMT',
+22 silly get     connection: 'keep-alive',
+22 silly get     'set-cookie': [ '__cfduid=dc673bc5ed98921d452296b334e594c981572590614; expires=Sat, 31-Oct-20 06:43:34 GMT; path=/; domain=.npmjs.org; HttpOnly' ],
+22 silly get     'cf-cache-status': 'HIT',
+22 silly get     'cache-control': 'max-age=300',
+22 silly get     'cf-ray': '52ebe52d1e4bdcba-SIN',
+22 silly get     age: '99',
+22 silly get     etag: '"969b0bc4374c874f25d56ee6071a3530"',
+22 silly get     'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+22 silly get     'last-modified': 'Mon, 19 Aug 2019 04:18:26 GMT',
+22 silly get     vary: 'accept-encoding, accept',
+22 silly get     'x-amz-meta-rev': '98-0896ce6fda40ab55ea877531ff8cdc93',
+22 silly get     server: 'cloudflare' } ]
+23 verbose etag https://registry.npmjs.org/oracledb from cache
+24 verbose get saving oracledb to /home/sushantnigudkar/.npm/registry.npmjs.org/oracledb/.cache.json
+25 silly install normalizeTree
+26 silly loadCurrentTree Finishing
+27 silly loadIdealTree Starting
+28 silly install loadIdealTree
+29 silly cloneCurrentTree Starting
+30 silly install cloneCurrentTreeToIdealTree
+31 silly cloneCurrentTree Finishing
+32 silly loadShrinkwrap Starting
+33 silly install loadShrinkwrap
+34 silly loadShrinkwrap Finishing
+35 silly loadAllDepsIntoIdealTree Starting
+36 silly install loadAllDepsIntoIdealTree
+37 silly resolveWithNewModule oracledb@4.0.1 checking installable status
+38 silly cache add args [ 'oracledb', null ]
+39 verbose cache add spec oracledb
+40 silly cache add parsed spec Result {
+40 silly cache add   raw: 'oracledb',
+40 silly cache add   scope: null,
+40 silly cache add   name: 'oracledb',
+40 silly cache add   rawSpec: '',
+40 silly cache add   spec: 'latest',
+40 silly cache add   type: 'tag' }
+41 silly addNamed oracledb@latest
+42 verbose addNamed "latest" is being treated as a dist-tag for oracledb
+43 info addNameTag [ 'oracledb', 'latest' ]
+44 silly mapToRegistry name oracledb
+45 silly mapToRegistry using default registry
+46 silly mapToRegistry registry https://registry.npmjs.org/
+47 silly mapToRegistry uri https://registry.npmjs.org/oracledb
+48 verbose addNameTag registry:https://registry.npmjs.org/oracledb not in flight; fetching
+49 verbose get https://registry.npmjs.org/oracledb not expired, no request
+50 silly addNameTag next cb for oracledb with tag latest
+51 silly addNamed oracledb@4.0.1
+52 verbose addNamed "4.0.1" is a plain semver version for oracledb
+53 silly cache afterAdd oracledb@4.0.1
+54 verbose afterAdd /home/sushantnigudkar/.npm/oracledb/4.0.1/package/package.json not in flight; writing
+55 verbose afterAdd /home/sushantnigudkar/.npm/oracledb/4.0.1/package/package.json written
+56 silly loadAllDepsIntoIdealTree Finishing
+57 silly idealTree:prePrune crisil
+57 silly idealTree:prePrune `-- oracledb@4.0.1
+58 silly loadIdealTree Finishing
+59 silly currentTree crisil
+60 silly idealTree crisil
+60 silly idealTree `-- oracledb@4.0.1
+61 silly generateActionsToTake Starting
+62 silly install generateActionsToTake
+63 silly generateActionsToTake Finishing
+64 silly diffTrees action count 1
+65 silly diffTrees add oracledb@4.0.1
+66 silly decomposeActions action count 8
+67 silly decomposeActions fetch oracledb@4.0.1
+68 silly decomposeActions extract oracledb@4.0.1
+69 silly decomposeActions test oracledb@4.0.1
+70 silly decomposeActions preinstall oracledb@4.0.1
+71 silly decomposeActions build oracledb@4.0.1
+72 silly decomposeActions install oracledb@4.0.1
+73 silly decomposeActions postinstall oracledb@4.0.1
+74 silly decomposeActions finalize oracledb@4.0.1
+75 silly executeActions Starting
+76 silly install executeActions
+77 silly doSerial global-install 0
+78 silly doParallel fetch 1
+79 verbose lock using /home/sushantnigudkar/.npm/_locks/staging-adad15c7c95ab8ef.lock for /home/sushantnigudkar/Desktop/crisil/node_modules/.staging
+80 silly doParallel extract 1
+81 silly extract oracledb@4.0.1
+82 verbose unbuild node_modules/.staging/oracledb-003d24f5
+83 silly gentlyRm /home/sushantnigudkar/Desktop/crisil/node_modules/.staging/oracledb-003d24f5 is being purged from base /home/sushantnigudkar/Desktop/crisil
+84 verbose gentlyRm don't care about contents; nuking /home/sushantnigudkar/Desktop/crisil/node_modules/.staging/oracledb-003d24f5
+85 verbose tar unpack /home/sushantnigudkar/.npm/oracledb/4.0.1/package.tgz
+86 verbose tar unpacking to /home/sushantnigudkar/Desktop/crisil/node_modules/.staging/oracledb-003d24f5
+87 silly gentlyRm /home/sushantnigudkar/Desktop/crisil/node_modules/.staging/oracledb-003d24f5 is being purged
+88 verbose gentlyRm don't care about contents; nuking /home/sushantnigudkar/Desktop/crisil/node_modules/.staging/oracledb-003d24f5
+89 silly gunzTarPerm modes [ '755', '644' ]
+90 silly gunzTarPerm extractEntry package.json
+91 silly gunzTarPerm extractEntry CHANGELOG.md
+92 silly gunzTarPerm extractEntry index.js
+93 silly gunzTarPerm extractEntry LICENSE.md
+94 silly gunzTarPerm extractEntry README.md
+95 silly gunzTarPerm extractEntry build/Release/oracledb-4.0.1-darwin-x64.node
+96 silly gunzTarPerm extractEntry build/Release/oracledb-4.0.1-darwin-x64.node-buildinfo.txt
+97 silly gunzTarPerm extractEntry build/Release/oracledb-4.0.1-linux-x64.node
+98 silly gunzTarPerm extractEntry build/Release/oracledb-4.0.1-linux-x64.node-buildinfo.txt
+99 silly gunzTarPerm extractEntry build/Release/oracledb-4.0.1-win32-x64.node
+100 silly gunzTarPerm extractEntry build/Release/oracledb-4.0.1-win32-x64.node-buildinfo.txt
+101 silly gunzTarPerm extractEntry lib/aqDeqOptions.js
+102 silly gunzTarPerm extractEntry lib/aqEnqOptions.js
+103 silly gunzTarPerm extractEntry lib/aqMessage.js
+104 silly gunzTarPerm extractEntry lib/aqQueue.js
+105 silly gunzTarPerm extractEntry lib/connection.js
+106 silly gunzTarPerm extractEntry lib/dbObject.js
+107 silly gunzTarPerm extractEntry lib/lob.js
+108 silly gunzTarPerm extractEntry lib/oracledb.js
+109 silly gunzTarPerm extractEntry lib/pool.js
+110 silly gunzTarPerm extractEntry lib/querystream.js
+111 silly gunzTarPerm extractEntry lib/resultset.js
+112 silly gunzTarPerm extractEntry lib/sodaCollection.js
+113 silly gunzTarPerm extractEntry lib/sodaDatabase.js
+114 silly gunzTarPerm extractEntry lib/sodaDocCursor.js
+115 silly gunzTarPerm extractEntry lib/sodaDocument.js
+116 silly gunzTarPerm extractEntry lib/sodaOperation.js
+117 silly gunzTarPerm extractEntry lib/util.js
+118 silly gunzTarPerm extractEntry package/install.js
+119 silly gunzTarPerm extractEntry package/prunebinaries.js
+120 silly gunzTarPerm extractEntry package/README.md
+121 silly gentlyRm /home/sushantnigudkar/Desktop/crisil/node_modules/.staging/oracledb-003d24f5/node_modules is being purged
+122 verbose gentlyRm don't care about contents; nuking /home/sushantnigudkar/Desktop/crisil/node_modules/.staging/oracledb-003d24f5/node_modules
+123 silly doParallel preinstall 1
+124 silly preinstall oracledb@4.0.1 /home/sushantnigudkar/Desktop/crisil/node_modules/.staging/oracledb-003d24f5
+125 info lifecycle oracledb@4.0.1~preinstall: oracledb@4.0.1
+126 silly lifecycle oracledb@4.0.1~preinstall: no script for preinstall, continuing
+127 silly doReverseSerial remove 0
+128 silly doSerial move 0
+129 silly doSerial finalize 1
+130 silly finalize /home/sushantnigudkar/Desktop/crisil/node_modules/oracledb
+131 silly doSerial build 1
+132 silly build oracledb@4.0.1
+133 info linkStuff oracledb@4.0.1
+134 silly linkStuff oracledb@4.0.1 has /home/sushantnigudkar/Desktop/crisil/node_modules as its parent node_modules
+135 verbose linkBins oracledb@4.0.1
+136 verbose linkMans oracledb@4.0.1
+137 silly doSerial global-link 0
+138 silly doParallel update-linked 0
+139 silly doSerial install 1
+140 silly install oracledb@4.0.1 /home/sushantnigudkar/Desktop/crisil/node_modules/.staging/oracledb-003d24f5
+141 info lifecycle oracledb@4.0.1~install: oracledb@4.0.1
+142 verbose lifecycle oracledb@4.0.1~install: unsafe-perm in lifecycle false
+143 verbose lifecycle oracledb@4.0.1~install: PATH: /usr/share/npm/bin/node-gyp-bin:/home/sushantnigudkar/Desktop/crisil/node_modules/oracledb/node_modules/.bin:/home/sushantnigudkar/Desktop/crisil/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+144 verbose lifecycle oracledb@4.0.1~install: CWD: /home/sushantnigudkar/Desktop/crisil/node_modules/oracledb
+145 silly lifecycle oracledb@4.0.1~install: Args: [ '-c', 'node package/install.js' ]
+146 silly lifecycle oracledb@4.0.1~install: Returned: code: 87  signal: null
+147 info lifecycle oracledb@4.0.1~install: Failed to exec install script
+148 verbose unlock done using /home/sushantnigudkar/.npm/_locks/staging-adad15c7c95ab8ef.lock for /home/sushantnigudkar/Desktop/crisil/node_modules/.staging
+149 silly rollbackFailedOptional Starting
+150 silly rollbackFailedOptional Finishing
+151 silly runTopLevelLifecycles Starting
+152 silly runTopLevelLifecycles Finishing
+153 silly install printInstalled
+154 warn enoent ENOENT: no such file or directory, open '/home/sushantnigudkar/Desktop/crisil/package.json'
+155 warn crisil No description
+156 warn crisil No repository field.
+157 warn crisil No README data
+158 warn crisil No license field.
+159 verbose stack Error: oracledb@4.0.1 install: `node package/install.js`
+159 verbose stack Exit status 87
+159 verbose stack     at EventEmitter.<anonymous> (/usr/share/npm/lib/utils/lifecycle.js:232:16)
+159 verbose stack     at emitTwo (events.js:87:13)
+159 verbose stack     at EventEmitter.emit (events.js:172:7)
+159 verbose stack     at ChildProcess.<anonymous> (/usr/share/npm/lib/utils/spawn.js:24:14)
+159 verbose stack     at emitTwo (events.js:87:13)
+159 verbose stack     at ChildProcess.emit (events.js:172:7)
+159 verbose stack     at maybeClose (internal/child_process.js:821:16)
+159 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:211:5)
+160 verbose pkgid oracledb@4.0.1
+161 verbose cwd /home/sushantnigudkar/Desktop/crisil
+162 error Linux 4.15.0-65-generic
+163 error argv "/usr/bin/nodejs" "/usr/bin/npm" "install" "oracledb"
+164 error node v4.2.6
+165 error npm  v3.5.2
+166 error code ELIFECYCLE
+167 error oracledb@4.0.1 install: `node package/install.js`
+167 error Exit status 87
+168 error Failed at the oracledb@4.0.1 install script 'node package/install.js'.
+168 error Make sure you have the latest version of node.js and npm installed.
+168 error If you do, this is most likely a problem with the oracledb package,
+168 error not with npm itself.
+168 error Tell the author that this fails on your system:
+168 error     node package/install.js
+168 error You can get information on how to open an issue for this project with:
+168 error     npm bugs oracledb
+168 error Or if that isn't available, you can get their info via:
+168 error     npm owner ls oracledb
+168 error There is likely additional logging output above.
+169 verbose exit [ 1, true ]

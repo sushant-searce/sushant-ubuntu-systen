@@ -1,0 +1,32 @@
+DECLARE @begin binary(10), @end binary(10);
+SET @begin = sys.fn_cdc_get_min_lsn('cdc_first');
+SET @end   = sys.fn_cdc_get_max_lsn();
+INSERT INTO CDC.dbo.first_cdc(__$start_lsn, Operation, ID, Name, OtherID)
+SELECT __$start_lsn
+       --, __$seqval
+       , CASE
+              WHEN __$operation = 1 THEN 'DELETE'
+              WHEN __$operation = 2 THEN 'INSERT'
+              WHEN __$operation = 3 THEN 'PRE-UPDATE'
+              WHEN __$operation = 4 THEN 'POST-UPDATE'
+              ELSE 'UNKNOWN'
+       END AS Operation
+       --, __$update_mask
+       , ID
+       , Name
+       , OtherID
+FROM cdc.fn_cdc_get_all_changes_cdc_first(@begin, @end, N'all update old'); 
+GO
+
+==============================================================================================================
+
+WITH CTEE AS (
+select __$start_lsn, Operation, ID, Name, OtherID  from CDC.dbo.first_cdc WHERE Operation != 'PRE-UPDATE'
+)
+, cte AS (
+select __$start_lsn, Operation, ID, Name, OtherID, ROW_NUMBER() over (partition by id order by __$start_lsn desc) as rnum from CTEE
+)
+INSERT INTO CDC.dbo.first_temp (__$start_lsn, Operation, ID, Name, OtherID)
+select __$start_lsn, Operation, ID, Name, OtherID from cte where rnum = 1;
+
+==============================================================================================================

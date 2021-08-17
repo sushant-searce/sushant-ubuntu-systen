@@ -1,0 +1,82 @@
+Hive-
+	Difference between internal and external table ?
+	Partitioning and bucketing in hive 
+	Hive vs Hbase
+Spark-
+	What is Apache Spark and what is RDD in spark
+	Apache Spark Architecture. How to Run Spark applications?
+Hadoop-
+   What is Namenode and Datanode
+   Hdfs commands
+   
+version: '3'
+services:
+  kafka_manager:
+	container_name: kafka_manager-v1
+	image: hlebalbau/kafka-manager:stable
+	ports:
+	  - "9000:9000"
+	environment:
+	  ZK_HOSTS: "10.3.2.4:2181,10.3.2.5:2181,10.3.2.6:2181"
+	  APPLICATION_SECRET: "letmein"
+	  KAFKA_MANAGER_AUTH_ENABLED: "true"
+	  KAFKA_MANAGER_USERNAME: auryc-admin
+	  KAFKA_MANAGER_PASSWORD: NGoNJuyHlpEVW
+	command: -Dpidfile.path=/dev/null
+
+
+export ZK_HOSTS=10.3.2.4:2181,10.3.2.5:2181,10.3.2.6:2181
+
+[Unit]
+Description=kafka service with docker compose
+#Requires=docker.service
+#After=docker.service
+After=kafka.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+WorkingDirectory=/etc/docker/compose/kafka-manager
+ExecStart=/usr/local/bin/docker-compose up -d --remove-orphans
+ExecStop=/usr/local/bin/docker-compose down
+
+[Install]
+WantedBy=multi-user.target
+
+
+================================================================
+
+
+version: '3'
+    kafka_manager:
+    container_name: kafka_manager
+    image: hlebalbau/kafka-manager:stable
+    ports:
+    - "9191:9000"
+    environment:
+    ZK_HOSTS: zookeeper:2181
+    command: -Dpidfile.path=/dev/null
+    labels:
+    - "traefik.enable=true"
+    - "traefik.backend=kafka_manager"
+    - "traefik.frontend.rule= Host:kafka.${APP_PROFILE}.admin.auryc.co"
+    - "traefik.port=9000"
+
+    =============================================
+
+
+version: '3'
+    kafka_manager:
+    container_name: kafka_manager
+    image: hlebalbau/kafka-manager:stable
+    ports:
+    - "9191:9000"
+    environment:
+        ZK_HOSTS: 10.3.2.4:2181,10.3.2.5:2181,10.3.2.6:2181
+        APPLICATION_SECRET: "random-secret"
+        KAFKA_MANAGER_AUTH_ENABLED: "true"
+        KAFKA_MANAGER_USERNAME: admin
+        KAFKA_MANAGER_PASSWORD: password
+    command: -Dpidfile.path=/dev/null
+
+

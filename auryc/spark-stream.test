@@ -1,0 +1,212 @@
+package spark
+
+import org.apache.spark.sql.Row
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
+//import org.apache.spark.streaming._
+//import org.apache.spark.streaming.kafka._
+
+object auryc {
+  def main(args: Array[String]) {
+
+    Logger.getLogger("org").setLevel(Level.OFF)
+    Logger.getLogger("akka").setLevel(Level.OFF)
+    
+    println("program_is_going_to_start")
+    
+    val sc = SparkSession.builder().appName("app_name").master("local[*]").getOrCreate()
+    import sc.implicits._
+    val ds1 = sc
+      .readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "104.197.45.113:9092")
+      .option("subscribe", "sushant")
+      .option("startingOffsets", "earliest") 
+      .load()
+      .writeStream
+      .outputMode("append")
+      .format("json")
+      .option("path", "hdfs://kafka-streaming-kafka-test:9870/kafka/")
+      .option("checkpointLocation", "hdfs://kafka-streaming-kafka-test:9870/tmp/checkpoint/")
+      .start()
+      .awaitTermination()
+
+//     df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)").as[(String, String)]
+//     df.write.format("json").save("/home/sushantnigudkar/Desktop/spark-testing-prep/awesome.json")
+
+//    val query2 = ds1.writeStream
+//        .format("console")
+//        .start()
+//      
+//    ds1.printSchema()
+//    query2.awaitTermination()   
+      
+    println("program has been completed")
+
+
+
+//    val sc = SparkSession.builder().appName("app_name").master("local[*]").getOrCreate()
+//    val df = sc
+//      .read
+//      .format("kafka")
+//      .option("kafka.bootstrap.servers", "192.168.0.19:9092")
+//      .option("subscribe", "searce")
+//      .load()
+//     df.show()
+
+  }
+
+  
+}
+
+=============================================================================================================================
+
+
+package spark
+
+import org.apache.spark.sql.Row
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
+object auryc {
+  def main(args: Array[String]) {
+
+    Logger.getLogger("org").setLevel(Level.OFF)
+    Logger.getLogger("akka").setLevel(Level.OFF)
+    
+    println("program_is_going_to_start")
+    
+    val sc = SparkSession.builder().appName("app_name").master("local[*]").getOrCreate()
+    import sc.implicits._
+    val ds1 = sc
+      .readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "104.197.45.113:9092")
+      .option("subscribe", "sushant")
+      .option("startingOffsets", "earliest")
+      .load()
+      .writeStream
+      .outputMode("append")
+      .format("json")
+      .option("path", "gs://sushant-julo-test-blucket/kafka/")
+      .option("checkpointLocation", "gs://sushant-julo-test-blucket/kafka/checkpoint/")
+      .start()
+      .awaitTermination()
+
+      
+    println("program has been completed")
+
+  } 
+}
+
+
+=================================================================================================
+
+package spark
+
+import org.apache.spark.sql.Row
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
+object auryc {
+  def main(args: Array[String]) {
+
+    Logger.getLogger("org").setLevel(Level.OFF)
+    Logger.getLogger("akka").setLevel(Level.OFF)
+    
+    println("program_is_going_to_start")
+    
+    val sc = SparkSession.builder().appName("app_name").master("local[*]").getOrCreate()
+    import sc.implicits._
+    val ds1 = sc
+      .readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "35.223.30.149:9092")
+      .option("subscribe", "sushant")
+      .option("startingOffsets", "earliest")
+      .load()
+      
+    ds1.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+  .as[(String, String)]
+    
+    val query2 = ds1.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+        .writeStream
+        .format("console")
+        .start()
+      
+    ds1.printSchema()
+    query2.awaitTermination()   
+      
+    
+    println("program has been completed")
+
+  } 
+}
+
+
+=========================================================================================================
+
+
+
+package spark
+
+import org.apache.spark.sql.Row
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
+object auryc {
+  def main(args: Array[String]) {
+
+    Logger.getLogger("org").setLevel(Level.OFF)
+    Logger.getLogger("akka").setLevel(Level.OFF)
+    
+    println("program_is_going_to_start")
+    
+    val sc = SparkSession.builder().appName("app_name").master("local[*]").getOrCreate()
+    import sc.implicits._
+    val ds1 = sc
+      .readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "35.223.30.149:9092")
+      .option("subscribe", "sushant")
+      .option("startingOffsets", "earliest")
+      .load()
+      
+    ds1.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+  .as[(String, String)]
+    
+    val query2 = ds1.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+      .writeStream
+      .outputMode("append")
+      .format("json")
+      .option("path", "/home/sushantnigudkar/Desktop/spark-testing-prep/awesome")
+      .option("checkpointLocation", "/home/sushantnigudkar/Desktop/spark-testing-prep/checkpoint/")
+      .start()
+      .awaitTermination()
+
+      
+    println("program has been completed")
+
+  } 
+}
+
+
+========================================================================================================
+

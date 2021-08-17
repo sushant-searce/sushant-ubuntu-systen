@@ -1,0 +1,30 @@
+# For glue we just need to pass s3 bucket script location that executes the job.
+
+deployment:
+  config:
+    jobExecuteType: glueetl                         # can be hardcoded
+    jobMaxCapacity: 5                               # Can be hardcoded
+    jobName: lgSearceGlueAddJob                     # Name for your glue job definition it can be hardcoded
+    jobScriptLocation: s3://testing-input-output-bucket/files/gluescript.py    # S3 bucket location of spark code that executes the job 
+    jobTimeout: 10                                  # can be hardcoded
+    jobVersion: v1                                  # Job version name can be hardcoded
+  type: glue
+input:
+  source:
+  - argName: inputfile
+    filePath: s3://amplify-tlpp-testtwo-73424-deployment/public/Workflow/ExecutionFiles/1611030211/1611224818574/data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_batch_data_cleansed.csv    # Only CSV file is supported because script which we are running convers CSV (input) to Parquet (output)
+    name: data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_data_loader-1610995373_batch_data_cleansed.csv
+    srcType: S3
+metaData:
+  config: default
+  description: Glue Job
+  name: Glue Module
+  team: NLP
+  version: 1
+output:
+  dest:
+  - contentType: Text/CSV/parquet
+    fileName: file_convert.parquet
+    filePath: s3://lppdatasource73424-testtwo/public/DataLoad/Outputs/Outputs1/f2b34b82-0747-46de-9ead-e7387f36da62_output.undefined
+    fileSourceType: S3
+    name: f2b34b82-0747-46de-9ead-e7387f36da62_output.undefined

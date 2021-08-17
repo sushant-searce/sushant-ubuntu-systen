@@ -1,0 +1,23 @@
+{
+	"name":"prod-aurora-cluster-sink-mysql-jdbc-mssqlV1",
+	"config":{
+		"connector.class":"io.confluent.connect.jdbc.JdbcSinkConnector",
+		"tasks.max":3,
+		"auto.create":true,
+		"schemas.enable":false,
+        "connection.url": "jdbc:sqlserver://172.27.9.10:1433;databaseName=ReportingServices;username=rw_datalake;password=2Wd@TaL4Ke456",
+		"transforms": "unwrap",
+		"transforms.unwrap.type": "io.debezium.transforms.UnwrapFromEnvelope",
+        "transforms.unwrap.drop.tombstones": "true",
+        "transforms.unwrap.operation.header": "true",
+        "transforms.unwrap.add.source.fields": "ts_ms",
+        "transforms.unwrap.delete.handling.mode":"rewrite",
+		"topics.regex": "mysql-prod-aurora-mssqlV1.crowdSysProd.(.*)",
+		"table.name.format": "ReportingServices.sink.${topic}",
+		"transforms": "route",
+		"transforms.route.regex": "([^.]+)\\.([^.]+)\\.([^.]+)",
+		"transforms.route.replacement": "$2_$3",
+		"transforms.route.type": "org.apache.kafka.connect.transforms.RegexRouter",
+		"auto.evolve": true
+	}	
+}

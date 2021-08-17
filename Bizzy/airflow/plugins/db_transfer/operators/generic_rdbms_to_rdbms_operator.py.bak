@@ -1,0 +1,209 @@
+import logging
+import os
+from airflow.hooks.mysql_hook import MySqlHook
+from airflow.hooks.mssql_hook import MsSqlHook
+from airflow.hooks.postgres_hook import PostgresHook
+from airflow.models import BaseOperator
+from airflow.utils.decorators import apply_defaults
+from pathlib import Path
+
+
+class GenericRdbmsToRdbmsTransferOperator(BaseOperator):
+    """
+    Executes sql code in a source RDBMS database and transfer into another RDBMS database.
+
+    :param sql: the sql code to be executed
+    :type sql: Can receive a str representing a sql statement,
+        a list of str (sql statements), or reference to a template file.
+        Template reference are recognized by str ending in '.sql'
+    :param src_db_type: Source RDBMS type. Can be of of:
+
+            - mysql
+            - postgres
+            - mssql
+
+    :type src_db_type: string
+    :param src_conn_id: Source connection ID
+    :type src_conn_id: string
+    :param dest_db_type: Destination RDBMS type. Can be of of:
+
+            - mysql
+            - postgres
+            - mssql
+
+    :type dest_db_type: string
+    :param dest_conn_id: Destination connection ID
+    :type dest_conn_id: string
+    :param dest_tablename: Destination table name. Use `schema.tablename` if needed
+    :type dest_tablename: string
+    :param dest_target_fields: List of target fields. Must use same ordering with target table fields
+    :type dest_target_fields: list
+    :param dest_preoperator: SQL statement to be executed before data transfer
+    :type dest_preoperator: string
+    :param dest_postoperator: SQL statement to be executed after data transfer
+    :type dest_postoperator: string
+    :param parameters: a parameters dict that is substituted at query runtime.
+    :type parameters: dict
+    :param fetch_size: If supplied indicates the number of rows to be fetch from source for each batch
+    :type fetch_size: int
+    :param commit_every: If supplied indicates the number of rows to be committed to destination for each batch
+    :type commit_every: int
+    :param use_file: Set as True if requires bulk loading via intermediary local temporary file. Useful for large data that can not fit in memory
+    :type use_file: bool
+    :param temp_file: Temporary intermediary file path
+    :type temp_file: string
+
+    """
+
+    template_fields = ('sql', 'parameters', 'dest_tablename',
+                       'dest_preoperator', 'dest_postoperator',
+                       'temp_file')
+    template_ext = ('.sql',)
+    ui_color = '#6666FF'
+
+    @apply_defaults
+    def __init__(
+            self,
+            sql,
+            src_db_type,
+            src_conn_id,
+            dest_db_type,
+            dest_conn_id,
+            dest_tablename,
+            dest_target_fields=None,
+            dest_preoperator=None,
+            dest_postoperator=None,
+            parameters=None,
+            fetch_size=1000,
+            commit_every=1000,
+            use_file=False,
+            temp_file=None,
+            *args, **kwargs):
+        super(GenericRdbmsToRdbmsTransferOperator,
+              self).__init__(*args, **kwargs)
+        self.sql = sql
+
+        self.src_db_type = src_db_type
+        self.src_conn_id = src_conn_id
+
+        self.dest_db_type = dest_db_type
+        self.dest_conn_id = dest_conn_id
+        self.dest_tablename = dest_tablename
+        self.dest_target_fields = dest_target_fields
+        self.dest_preoperator = dest_preoperator
+        self.dest_postoperator = dest_postoperator
+        self.parameters = parameters
+        self.fetch_size = fetch_size
+        self.commit_every = commit_every
+
+        self.use_file = use_file
+        self.temp_file = temp_file
+
+        # Choosing appropriate hooks
+        # Currently only supports these RDBMS
+        #   - MySQL
+        #   - PostgreSQL
+        #   - Microsoft SQL Server
+        self.allowed_db_types = ['mysql', 'postgres', 'mssql']
+
+        if self.dest_db_type not in self.allowed_db_types:
+            raise Exception(
+                f'Unsupported destination RDBMS type. Please use any of {self.allowed_db_types}')
+
+    def _rdbms(self, db_type, conn_id):
+        if db_type.lower() == 'mysql':
+            return MySqlHook(mysql_conn_id=conn_id)
+        elif db_type.lower() == 'postgres':
+            return PostgresHook(postgres_conn_id=conn_id)
+        elif db_type.lower() == 'mssql':
+            return MsSqlHook(mssql_conn_id=conn_id)
+        else:
+            raise Exception(
+                f'Unsupported source RDBMS type. Please use any of {self.allowed_db_types}')
+
+    def _execute_with_intermediate_file(self):
+        temp_file = self.temp_file
+        directory = os.path.dirname(temp_file)
+        Path(directory).mkdir(parents=True, exist_ok=True)
+
+        src_rdbms = self._rdbms(self.src_db_type, self.src_conn_id)
+        dest_rdbms = self._rdbms(self.dest_db_type, self.dest_conn_id)
+        query = f"({self.sql})"
+
+        logging.info(f"Running bulk dump into {temp_file}")
+        src_rdbms.bulk_dump(query, temp_file)
+
+        if self.dest_preoperator:
+            logging.info("Running destination preoperator")
+            dest_rdbms.run(self.dest_preoperator)
+
+        logging.info(
+            f"Running bulk load into {self.dest_conn_id} table name {self.dest_tablename}")
+        dest_rdbms.bulk_load_custom(
+            self.dest_tablename, temp_file, duplicate_key_handling='REPLACE')
+
+        if self.dest_postoperator:
+            logging.info("Running destination postoperator")
+            dest_rdbms.run(self.dest_postoperator)
+
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
+            logging.info(f"Temporary file {temp_file} removed.")
+
+        logging.info("Done.")
+
+    def _execute_direct(self):
+        src_rdbms = self._rdbms(self.src_db_type, self.src_conn_id)
+        dest_rdbms = self._rdbms(self.dest_db_type, self.dest_conn_id)
+
+        src_conn = src_rdbms.get_conn()
+
+        if self.src_db_type.lower() == 'postgres':
+            src_cursor = src_conn.cursor("serverCursor")
+        else:
+            src_cursor = src_conn.cursor()
+
+        logging.info('Executing (server side cursor): ' + str(self.sql))
+        src_cursor.execute(self.sql, self.parameters)
+
+        if self.dest_preoperator:
+            logging.info("Running destination preoperator")
+            dest_rdbms.run(self.dest_preoperator)
+
+        logging.info("Inserting rows into destination")
+        if self.fetch_size is not None and self.fetch_size > 0:
+            log_text = f"Load data using fetch size {self.fetch_size} and commit every {self.commit_every} rows"
+            logging.info(log_text)
+            while True:
+                records = src_cursor.fetchmany(size=self.fetch_size)
+                print(records)
+                if not records:
+                    break
+                dest_rdbms.insert_rows(table=self.dest_tablename,
+                                       rows=records,
+                                       commit_every=self.commit_every)
+        else:
+            log_text = f"Load data without batch"
+            logging.info(log_text)
+            dest_rdbms.insert_rows(table=self.dest_tablename,
+                                   rows=src_cursor,
+                                   target_fields=self.dest_target_fields)
+
+        if self.dest_postoperator:
+            logging.info("Running destination postoperator")
+            dest_rdbms.run(self.dest_postoperator)
+
+        src_cursor.close()
+        src_conn.close()
+
+        logging.info("Done.")
+
+    def execute(self, context):
+        log_text = f"Transferring query results from {self.src_conn_id} into destination database: {self.dest_conn_id}"
+        logging.info(log_text)
+
+        if self.use_file:
+            self._execute_with_intermediate_file()
+        else:
+            self._execute_direct()
+

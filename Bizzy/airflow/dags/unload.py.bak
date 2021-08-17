@@ -1,0 +1,46 @@
+import os, time
+from datetime import datetime, timedelta
+from airflow import DAG
+from airflow.hooks.postgres_hook import PostgresHook
+from airflow.operators.python_operator import PythonOperator
+from airflow.operators.bash_operator import BashOperator
+from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.redshift_unload_plugin_production import S3ToRedshiftOperatorUnload
+
+folderName='rohit-searce'
+
+default_args = {
+    'owner': 'Airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2020, 1, 29),
+    'email_on_failure': False,
+    'email_on_retry': False,
+    # 'retry_delay': timedelta(minutes=5),
+    # 'queue': 'bash_queue',
+    # 'pool': 'backfill',
+    # 'priority_weight': 10,
+    # 'end_date': datetime(2016, 1, 1),
+}
+
+dag = DAG('unload-dag', default_args=default_args, schedule_interval=None)
+
+
+def load(number, **kwargs):
+    return S3ToRedshiftOperatorUnload(
+        task_id='unload_{}'.format(number),
+        redshift_conn_id="prod_redshift_connection",
+        table=number,
+        s3_bucket="prod-datalake-raw-data",
+        s3_path=folderName,
+        region="ap-southeast-1",
+        dag=dag)
+
+schema_details_query = """
+select * from schema_details where db_name='so_mgt_portal_prod' and table_name in ('bdp_so_custorder','bdp_so_custorder_detail1','bdp_so_custorder_detail2','bdp_so_custorder_detail3','bdp_so_custorder_log','bdp_so_master_config','bdp_so_master_config_detail','bdp_so_po_group','bdp_so_uploadpo_config','bdp_so_uploadpo_config_detail')
+"""
+
+myDatabaseHook = PostgresHook(postgres_conn_id='prod_postgres_connection')
+resultCounter = {}
+
+for record in myDatabaseHook.get_records(schema_details_query):
+    load(record[2])

@@ -1,0 +1,77 @@
+SET IDENTITY_INSERT CDC.dbo.first_temp ON
+
+WITH cte AS (
+select __$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID, ROW_NUMBER() over (partition by id order by __$start_lsn desc) as rnum from cdc.cdc_first_CT
+)
+select __$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID from cte where rnum = 1
+
+select * from aveva_test.dbo.first
+
+select * from aveva_test.cdc.cdc_first_CT order by __$start_lsn desc
+
+WITH cte AS (
+select __$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID, ROW_NUMBER() over (partition by id order by __$start_lsn desc) as rnum from cdc.cdc_first_CT
+)
+INSERT INTO CDC.dbo.first_temp (__$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID)
+select __$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID from cte where rnum = 1
+
+=========================================================================================================
+
+DECLARE @begin binary(10), @end binary(10);
+--SET @begin = sys.fn_cdc_get_min_lsn('cdc_first');
+select @begin = last_lsn_state from change_state where table_state = 'first_state';
+SET @end   = sys.fn_cdc_get_max_lsn();
+ INSERT INTO CDC.dbo.first_cdc(__$start_lsn, operation, ID, Name, OtherID)
+SELECT __$start_lsn
+       --, __$seqval
+       , CASE
+              WHEN __$operation = 1 THEN 'DELETE'
+              WHEN __$operation = 2 THEN 'INSERT'
+              WHEN __$operation = 3 THEN 'PRE-UPDATE'
+              WHEN __$operation = 4 THEN 'POST-UPDATE'
+              ELSE 'UNKNOWN'
+       END AS Operation
+       --, __$update_mask
+       , ID
+       , Name
+       , OtherID
+FROM cdc.fn_cdc_get_all_changes_cdc_first(@begin, @end, N'all update old'); 
+update change_state SET last_lsn_state = @end where  table_state = 'first_state' ;
+GO
+
+drop table CDC.dbo.first_cdc
+
+
+SET IDENTITY_INSERT CDC.dbo.first_cdc ON
+
+--select last_lsn_state from change_state where table_state = 'first_state';
+
+
+=============================================================================================================
+
+use CDC
+GO
+create table first_temp(
+       [__$start_lsn] [varbinary](max),
+	   [ID] [smallint] ,
+       [Name] [varchar](50) NULL,
+       [OtherID] [tinyint] NULL,
+	   [operation] [varchar](20) NULL
+	   );
+
+use aveva_test
+GO
+
+
+select * from aveva_test.cdc.cdc_first_CT
+
+
+insert into CDC.dbo.first_temp WITH cte AS (
+select __$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID, ROW_NUMBER() over (partition by id order by __$start_lsn desc) as rnum from cdc.cdc_first_CT
+)
+select __$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID from cte where rnum = 1
+
+
+===============================================================================================================
+
+

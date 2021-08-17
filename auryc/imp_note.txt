@@ -1,0 +1,43 @@
+gcloud compute start-iap-tunnel projects/auryc-development/zones/us-central1-a/instances/dev-auryc-windows-us-ct1-a-01 3389 --local-host-port=localhost:8080 --zone=us-central1-a
+username: searce
+password: (O;R:i[u,<V[1Pp
+username: searce_user
+password: w$dsqMx#qQE[o7n
+
+======================================================================================================================
+
+# clean_up_huge_autocomplete_indices_executorschedule
+
+Need elastic search address  
+Error - elasticsearch.exceptions.ConnectionError: ConnectionError
+
+
+# indexer_deployerschedule
+
+
+# session_replay_event_inspectorschedule
+
+RabbitMQ host and port
+
+
+===========================================================================================================================
+
+
+WARNING: The APP_PROFILE variable is not set. Defaulting to a blank string.
+WARNING: The APP_HOST variable is not set. Defaulting to a blank string.
+
+===========================================================================================================================
+
+Elasticsearch:
+host: elasticsearch-1.auryc.testing - 10.3.0.2
+host: elasticsearch-2.auryc.testing - 10.3.0.3
+host: elasticsearch-3.auryc.testing - 10.3.0.4
+port: 9200
+Kafka:
+host: kafka-1.auryc.testing - 10.3.2.1
+host: kafka-2.auryc.testing - 10.3.2.2
+host: kafka-3.auryc.testing - 10.3.2.3
+port: 9092
+RabbitMQ:
+host: rabbitmq.auryc.testing - 10.3.1.2
+port: 5672 (edited) 

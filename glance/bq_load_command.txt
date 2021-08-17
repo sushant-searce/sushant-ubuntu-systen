@@ -1,0 +1,21 @@
+bq load --source_format=NEWLINE_DELIMITED_JSON --hive_partitioning_mode=AUTO --autodetect --hive_partitioning_source_uri_prefix=gs://glanceaztogcspoc/analytics/json-hourly/cta_ended glancecdn-sandbox-c32a:glance_inmobi_analytics_poc.cta_ended gs://glanceaztogcspoc/analytics/json-hourly/cta_ended/*
+
+
+
+bq load --source_format=NEWLINE_DELIMITED_JSON --hive_partitioning_mode=AUTO --autodetect --hive_partitioning_source_uri_prefix=gs://glanceaztogcspoc/analytics/json-hourly/cta_started glancecdn-sandbox-c32a:glance_inmobi_analytics_poc.cta_started gs://glanceaztogcspoc/analytics/json-hourly/cta_started/*
+
+bq load --source_format=NEWLINE_DELIMITED_JSON --hive_partitioning_mode=AUTO --autodetect --hive_partitioning_source_uri_prefix=gs://glanceaztogcspoc/analytics/json-hourly/glance_ended glancecdn-sandbox-c32a:glance_inmobi_analytics_poc.glance_ended gs://glanceaztogcspoc/analytics/json-hourly/glance_ended/*
+
+bq load --source_format=NEWLINE_DELIMITED_JSON --hive_partitioning_mode=AUTO --autodetect --hive_partitioning_source_uri_prefix=gs://glanceaztogcspoc/analytics/json-hourly/glance_like glancecdn-sandbox-c32a:glance_inmobi_analytics_poc.glance_like gs://glanceaztogcspoc/analytics/json-hourly/glance_like/*
+
+bq load --source_format=NEWLINE_DELIMITED_JSON --hive_partitioning_mode=AUTO --autodetect --hive_partitioning_source_uri_prefix=gs://glanceaztogcspoc/analytics/json-hourly/glance_shared glancecdn-sandbox-c32a:glance_inmobi_analytics_poc.glance_shared gs://glanceaztogcspoc/analytics/json-hourly/glance_shared/*
+
+bq load --source_format=NEWLINE_DELIMITED_JSON --hive_partitioning_mode=AUTO --autodetect --hive_partitioning_source_uri_prefix=gs://glanceaztogcspoc/analytics/json-hourly/glance_started glancecdn-sandbox-c32a:glance_inmobi_analytics_poc.glance_started gs://glanceaztogcspoc/analytics/json-hourly/glance_started/*
+
+bq load --source_format=NEWLINE_DELIMITED_JSON --hive_partitioning_mode=AUTO --autodetect --hive_partitioning_source_uri_prefix=gs://glanceaztogcspoc/analytics/json-hourly/peek_ended glancecdn-sandbox-c32a:glance_inmobi_analytics_poc.peek_ended gs://glanceaztogcspoc/analytics/json-hourly/peek_ended/*
+
+bq load --source_format=NEWLINE_DELIMITED_JSON --hive_partitioning_mode=AUTO --autodetect --hive_partitioning_source_uri_prefix=gs://glanceaztogcspoc/analytics/json-hourly/peek_started glancecdn-sandbox-c32a:glance_inmobi_analytics_poc.peek_started gs://glanceaztogcspoc/analytics/json-hourly/peek_started/*
+
+bq load --source_format=NEWLINE_DELIMITED_JSON --hive_partitioning_mode=AUTO --autodetect --hive_partitioning_source_uri_prefix=gs://glanceaztogcspoc/analytics/json-hourly/video_ended glancecdn-sandbox-c32a:glance_inmobi_analytics_poc.video_ended gs://glanceaztogcspoc/analytics/json-hourly/video_ended/*
+
+bq load --source_format=NEWLINE_DELIMITED_JSON --hive_partitioning_mode=AUTO --autodetect --hive_partitioning_source_uri_prefix=gs://glanceaztogcspoc/analytics/json-hourly/video_started glancecdn-sandbox-c32a:glance_inmobi_analytics_poc.video_started gs://glanceaztogcspoc/analytics/json-hourly/video_started/*

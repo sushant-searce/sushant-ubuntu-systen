@@ -1,0 +1,115 @@
+
+psql -h prod-innovation-cluster.cluster-ca13ekcqckha.ap-southeast-1.rds.amazonaws.com	 -p 5432 -d thingsboard_prod -U debezium -W 
+G23eN0ff1CeP@rK678
+
+grant all privileges on database thingsboard_prod to rw_searce ;
+
+        "database.user": "rw_searce",
+        "database.password": "RWfor53arce",
+		
+		GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO debezium;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO debezium;
+
+
+
+ssh -i "bigdata-prep.pem" ubuntu@ec2-52-23-176-184.compute-1.amazonaws.com
+
+
+
+
+======================================================================================================================
+
+
+Partition(20) ["mysql-prod-crowdsys-apps-farmers-cluster",{"server":"prod-crowdsys-apps-farmer-cluster"}] {"file":"mysql-bin-changelog.000008","pos":120"}
+
+
+kafkacat -b b-3.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-1.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-2.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092 -C -t connect-offsets  -f 'Partition(%p) %k %s\\n' >> test.log
+
+
+
+
+snapshot log and event position - mysql-bin-changelog.000077 81793085
+
+Partition(7) ["prod-tms-cluster-mssqlV1",{"server":"prod-tms-clusterV1-mssqlV1"}] {"file":"mysql-bin-changelog.000080","pos":120}
+
+echo '["prod-tms-cluster-mssqlV1",{"server":"prod-tms-clusterV1-mssqlV1"}]|{"file":"mysql-bin-changelog.000077","pos":81793085}' | kafkacat -P -b b-3.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-1.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-2.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092 -t connect-offsets -K \| -p 7
+
+
+kafka-console-consumer --bootstrap-server b-3.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-1.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-2.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092  --topic connect-offsets --from-beginning
+
+Partition(20) ["mysql-prod-idsp-controltower",{"server":"prod-idsp-controltower-cluster"}] {"file":"mysql-bin-changelog.000008","pos":120,"row":1,"snapshot":true}\
+
+echo '["mysql-prod-Idsp-controltower",{"server":"prod-idsp-controltower-cluster"}]|{"file":"mysql-bin-changelog.000014","pos":77497869}' | kafkacat -P -b b-3.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-1.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-2.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092 -t connect-offsets -K \| -p 9
+
+
+Partition(19) ["mysql-prod-crowdsys-TMS-cluster",{"server":"prod-crowdsys-tms-cluster"}] {"file":"mysql-bin-changelog.000038","pos":120,"row":1,"snapshot":true}
+
+echo '["mysql-prod-crowdsys-TMS-cluster",{"server":"prod-crowdsys-tms-cluster"}]|{"file":"mysql-bin-changelog.000035","pos":17767083}' | kafkacat -P -b b-3.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-1.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092,b-2.datalake-msk-prod.f8zcho.c2.kafka.ap-southeast-1.amazonaws.com:9092 -t connect-offsets -K \| -p 19
+
+=======================================================================================================================
+
+
+psql -h prod-debezium-airflow.cegtg4k2vzhm.ap-southeast-1.rds.amazonaws.com -p 5432 -d debezium_airflow -U bizzy_airflow -W 
+	
+
+schema_details_query = """
+select * from cargowise_table where db_name='OdysseyPTBPRD' and table_name in ('AccChargeCode','AccGLAggregate','AccGLHeader','AccGroups','AccTransactionHeader','AccTransactionLines','AccTransactionMatchLink','DtbBooking','DtbBookingConfirmation','DtbBookingConsolidation','DtbBookingInstruction','DtbConsignmentRunSheetInstruction','GenCustomAddOnValue','GlbBranch','GlbCompany','GlbDepartment','GlbStaff','JobBookedCtgMove','JobCartage','JobChargeRevRecognition','JobConShipLink','JobConsol','JobConsolTransport','JobContainer','JobContainerDetention','JobContainerPackPivot','JobDocAddress','JobHeader','JobMawb','JobPackLines','JobSailing','JobShipment','JobStorage','JobSundryCharges','JobVoyAccount','JobVoyage','JobVoyDestination','JobVoyOrigin','OrgAddress','OrgHeader','OrgMiscServ','OrgPartCategory','OrgPartRelation','OrgPartUnit','OrgRelatedParty','OrgSupplierPart','ProcessTasks','RefCommodityCode','RefContainer','RefCurrency','StmALog','StmNote','vw_JobDocAddress','vw_Report_ProductInfo','WhsDocket','WhsDocketCustomAttributes','WhsDocketLine','WhsDocketLineCustomAttributes','WhsDocketReference','WhsLocation','WhsLocationView','WhsPick','WhsPickLine','WhsProductStyle','WhsProductStyleColour','WhsReleaseCapturedAttributes','WhsRow','WhsWarehouse')
+"""
+
+
+
+
+CREATE TABLE cargowise_batch_table (
+	id SERIAL PRIMARY KEY,
+	db_name VARCHAR(100) NOT NULL,
+	table_name VARCHAR(100) NOT NULL,
+	primary_key_column VARCHAR(100) NOT NULL
+	
+	);
+	
+===============================================================================================================
+
+
+List of Mysql source connectors-
+
+		mysql-prod-aurora-cluster
+		mysql-prod-bizzy-distribution-crows
+		mysql-prod-crowdsys-TMS-cluster-v1
+		mysql-prod-IDSP-controltower-v2
+		mysql-prod-crowdsys-apps-farmer-v1
+		mysql-prod-masterdata-mdm-cluster
+		mysql-prod-finance-controltower-cluster
+
+
+List of Mysql sink connectors-
+
+		s3-debezium-sink
+		s3-sink-so_mgt_portal_prod
+		s3-sink-TMSDB_prod
+		s3-sink-IDSP
+		s3-bff-sink
+		s3-sink-masterdatadb_prod
+		s3-fct-sink
+
+List of jdbc sink/source connectors (MSSQL)-
+
+		prod-crowdsys-apps-farmer-cluster-mssqlV1
+		prod-crowdsys-apps-farmer-cluster-Sink-mssqlV1
+
+		prod-aurora-cluster-mysql-jdbc-mssqlV1
+		prod-aurora-cluster-sink-mysql-jdbc-mssqlV1
+
+		prod-tms-cluster-mssqlV2
+		prod-tms-cluster-Sink-mssqlV2
+
+		prod-masterdata-mdm-cluster-mssqlV1
+		prod-masterdata-mdm-cluster-Sink-mssqlV1
+
+List of postgres connectors- 
+
+		prod-innovation-cluster-source-connector-V1_ts_kv
+		prod-innovation-cluster-source-connector-V1
+		s3-sink-prod-innovation-cluster
+		
+
+================================================================================================================

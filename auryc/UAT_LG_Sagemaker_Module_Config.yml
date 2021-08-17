@@ -1,0 +1,26 @@
+# Sagemaker optimisation is still pending(Dependency on Shashi from Aws)
+metaData:
+  name: BatchInference1
+  description: Sagemaker Model
+  config: default
+  version: 1.0
+  team: "NLP" 
+
+deployment:
+  type: batch_inference
+  config:
+    ArtifactLocation: https://cdk-modules-s3workflowbaselocationb2150c8a-1009mld0polge.s3.ap-south-1.amazonaws.com/model.tar.gz
+    image: xgboost                                    # need to be harcoded
+    model_name: CDK-XGBOOST-BreastCancerPrediction-1  # need to be harcoded
+    instance_count: 1                                 # User input
+
+input:
+  FilePath: s3://lppdatasource73424-testtwo/batch_data_cleansed.csv  # only CSV file is supported 
+  FileSourceType: S3
+  ContentType: text/csv
+outputs:
+  dest:
+    FileName: batch_data_cleansed
+    FileSourceType: S3
+    ContentType: Text/CSV
+    FilePath: s3://lppdatasource73424-testtwo/public/DataLoad/Outputs/Outputs1

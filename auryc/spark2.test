@@ -1,0 +1,45 @@
+package spark
+
+import org.apache.spark.sql.Row
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
+object auryc {
+  def main(args: Array[String]) {
+
+    Logger.getLogger("org").setLevel(Level.OFF)
+    Logger.getLogger("akka").setLevel(Level.OFF)
+    
+    println("program_is_going_to_start")
+    
+    val sc = SparkSession.builder().appName("app_name").master("yarn").getOrCreate()
+    import sc.implicits._
+    val ds1 = sc
+      .readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "35.223.94.115:9092")
+      .option("subscribe", "sushant")
+      .option("startingOffsets", "earliest")
+      .load()
+      
+    ds1.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+  .as[(String, String)]
+    
+    val query2 = ds1.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+      .writeStream
+      .outputMode("append")
+      .format("json")
+      .option("path", "gs://sushant-julo-test-blucket/kafka/")
+      .option("checkpointLocation", "gs://sushant-julo-test-blucket/kafka/checkpoint/")
+      .start()
+      .awaitTermination()
+
+      
+    println("program has been completed")
+
+  } 
+}

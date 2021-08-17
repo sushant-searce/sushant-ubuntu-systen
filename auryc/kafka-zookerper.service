@@ -1,0 +1,74 @@
+sudo vi /etc/systemd/system/zookeeper.service
+
+[Unit]
+Description=zookeeper service daemon
+[Service]
+EnvironmentFile=/etc/environment
+User=root
+Group=root
+Type=simple
+ExecStart= /opt/zookeeper/bin/zkServer.sh restart
+Restart=on-failure
+RestartSec=5s
+PrivateTmp=true
+[Install]
+WantedBy=multi-user.target
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable zookeeper.service
+sudo systemctl start zookeeper.service
+sudo systemctl status zookeeper.service
+sudo systemctl stop zookeeper.service
+sudo systemctl restart zookeeper.service
+
+
+======================================================================================================================
+
+
+sudo vi /etc/systemd/system/kafka.service
+
+[Unit]
+Description=kafka service daemon
+[Service]
+EnvironmentFile=/etc/environment
+User=root
+Group=root
+Type=simple
+ExecStart= /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties
+Restart=on-failure
+RestartSec=5s
+PrivateTmp=true
+[Install]
+WantedBy=multi-user.target
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable kafka.service
+sudo systemctl start kafka.service
+sudo systemctl status kafka.service
+sudo systemctl stop kafka.service
+sudo systemctl restart kafka.service
+
+========================================
+
+
+[Unit]
+Description=Docker Compose Kafka Manager Application Service
+Requires=docker.service
+After=docker.service
+After=kafka.service
+
+[Service]
+EnvironmentFile=/etc/environment
+User=root
+Group=root
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/srv/docker
+ExecStart=/usr/local/bin/docker-compose -f /opt/KM/docker-compose.yml up -d
+ExecStop=/usr/local/bin/docker-compose -f /opt/KM/docker-compose.yml down
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

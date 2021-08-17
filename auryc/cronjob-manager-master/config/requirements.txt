@@ -1,0 +1,6 @@
+boto3==1.9.165
+elasticsearch==7.0.2
+kafka-python==1.4.6
+pendulum==1.4.4
+pika==1.0.1
+pymysql==0.9.3

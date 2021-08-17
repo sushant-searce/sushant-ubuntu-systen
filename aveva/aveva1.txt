@@ -1,0 +1,161 @@
+use OurDatabse;
+GO
+EXEC sys.sp_cdc_disable_table
+  @source_name = 'Employee_main'
+ , @source_schema = 'dbo'
+ , @capture_instance = 'cdcauditing_Employee_main'
+GO
+
+use master
+GO
+drop database OurDatabse
+GO
+
+
+===================================================
+create database aviva_testing
+use aviva_testing
+
+use aviva_testing
+GO
+CREATE TABLE [searce_test](
+       [ID] [smallint] IDENTITY(1,1) primary key NOT NULL,
+       [Name] [varchar](50) NULL,
+       [OtherID] [tinyint] NULL
+)
+GO
+
+# To check is CDC enabled for database level
+SELECT is_cdc_enabled
+FROM sys.databases
+WHERE name = 'aveva_test'
+
+EXEC sys.sp_cdc_enable_db
+
+
+
+use aveva_test
+GO
+EXEC sys.sp_cdc_enable_table @source_schema = 'dbo'
+       , @source_name = 'first'
+       , @role_name = NULL
+       , @capture_instance = 'cdc_first'
+GO
+
+INSERT INTO first (Name,OtherID)
+VALUES ('zz',15)
+       , ('yy',16)
+       , ('xx',17)
+       , ('ww',18)
+	   
+
+
+
+
+
+
+
+
+DECLARE @begin binary(10), @end binary(10);
+SET @begin = sys.fn_cdc_get_min_lsn('cdc_first');
+SET @end   = sys.fn_cdc_get_max_lsn();
+SELECT * FROM cdc.fn_cdc_get_all_changes_cdc_first(@begin, @end, N'ALL')
+
+
+
+
+DECLARE @begin binary(10), @end binary(10);
+SET @begin = sys.fn_cdc_get_min_lsn('cdc_searce_test');
+SET @end   = sys.fn_cdc_get_max_lsn();
+SELECT * FROM cdc.fn_cdc_get_all_changes_cdc_searce_test(@begin, @end, N’all update old')
+
+
+UPDATE first
+SET Name = 'sanketi'
+WHERE Name = 'sak'
+ 
+ 
+DELETE FROM first
+WHERE Name = 'sanketi'
+ 
+ 
+INSERT INTO searce_test (Name,OtherID)
+VALUES ('Jason',5)
+
+DECLARE @begin binary(10), @end binary(10);
+SET @begin = sys.fn_cdc_get_min_lsn('cdc_searce_test');
+SET @end   = sys.fn_cdc_get_max_lsn();
+SELECT * FROM cdc.fn_cdc_get_all_changes_cdc_searce_test(@begin, @end, N'ALL')
+ 
+ 
+DECLARE @begin2 binary(10), @end2 binary(10);
+SET @begin2 = sys.fn_cdc_get_min_lsn('cdc_searce_test');
+SET @end2   = sys.fn_cdc_get_max_lsn();
+SELECT * FROM cdc.fn_cdc_get_all_changes_cdc_searce_test(@begin2, @end2, N'all update old')
+
+
+DECLARE @begin binary(10), @end binary(10);
+SET @begin = sys.fn_cdc_get_min_lsn('cdc_searce_test');
+SET @end   = sys.fn_cdc_get_max_lsn();
+ 
+SELECT __$start_lsn
+       --, __$seqval
+       , CASE
+              WHEN __$operation = 1 THEN 'DELETE'
+              WHEN __$operation = 2 THEN 'INSERT'
+              WHEN __$operation = 3 THEN 'PRE-UPDATE'
+              WHEN __$operation = 4 THEN 'POST-UPDATE'
+              ELSE 'UNKNOWN'
+       END AS Operation
+       --, __$update_mask
+       , ID
+       , Name
+       , OtherID
+FROM cdc.fn_cdc_get_all_changes_cdc_searce_test(@begin, @end, N'all update old')
+
+
+
+
+
+================================================================================
+
+DECLARE @begin binary(10), @end binary(10);
+SET @begin = sys.fn_cdc_get_min_lsn('cdcauditing_Employee_main');
+SET @end   = sys.fn_cdc_get_max_lsn();
+SELECT * FROM cdc.fn_cdc_get_all_changes_cdcauditing_Employee_main(@begin, @end, N'ALL')
+
+
+
+DECLARE @begin binary(10), @end binary(10);
+SET @begin = sys.fn_cdc_get_min_lsn('cdcauditing_Employee_main');
+SET @end   = sys.fn_cdc_get_max_lsn();
+SELECT * FROM cdc.fn_cdc_get_all_changes_cdcauditing_Employee_main(@begin, @end, N'ALL update old');
+
+
+
+
+
+DECLARE @begin binary(10), @end binary(10);
+SET @begin = sys.fn_cdc_get_min_lsn('cdcauditing_Employee_main');
+SET @end   = sys.fn_cdc_get_max_lsn();
+ 
+SELECT __$start_lsn
+       --, __$seqval
+       , CASE
+              WHEN __$operation = 1 THEN 'DELETE'
+              WHEN __$operation = 2 THEN 'INSERT'
+              WHEN __$operation = 3 THEN 'PRE-UPDATE'
+              WHEN __$operation = 4 THEN 'POST-UPDATE'
+              ELSE 'UNKNOWN'
+       END AS Operation
+       --, __$update_mask
+       , ID
+       , Name
+       , OtherID
+FROM cdc.fn_cdc_get_all_changes_cdcauditing_Employee_main(@begin, @end, N'all update old')
+
+
+
+
+
+

@@ -1,0 +1,67 @@
+use aviva_testing
+GO
+EXEC sys.sp_cdc_enable_table
+@source_schema = 'dbo',
+@source_name = 'searce3',
+@role_name = NULL,
+@capture_instance = 'cdc_searce3'
+GO
+
+EXEC sys.sp_cdc_disable_db
+
+use aviva_testing
+GO
+EXEC sys.sp_cdc_disable_table
+@source_schema = 'dbo',
+@source_name = 'searce2',
+@capture_instance = 'cdc_searce2'
+GO
+
+drop table searce_test;
+
+truncate table searce
+
+=======================================================================================================
+
+
+
+=======================================================================================================
+
+
+insert into temp.table with cte as (select column_names,ROW_NUMBER() over (partition by id order by lsn desc) as "rnum" from cdc.table)select column_names from cte where rnum=1;
+
+DELETE FROM main.table WHERE EXISTS ( SELECT 1 FROM temp.table WHERE 1=1  AND temp.table.id = main.table.id  );
+
+insert into main.table with cte as (select column_names from temp.table  WHERE __deleted='false' )select column_names from cte;
+
+====================================================================================================================
+
+WITH CTEE AS (
+select __$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID  from cdc.cdc_first_CT WHERE __$operation != 3 
+)
+, cte AS (
+(
+select __$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID, ROW_NUMBER() over (partition by id order by __$start_lsn desc) as rnum from CTEE
+)
+
+
+INSERT INTO CDC.dbo.first_temp (__$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID)
+select __$start_lsn, __$end_lsn, __$seqval, __$operation, ID, Name, OtherID from cte where rnum = 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

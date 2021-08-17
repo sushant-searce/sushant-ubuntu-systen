@@ -1,0 +1,202 @@
+gcloud compute ssh --tunnel-through-iap projects/auryc-development/zones/us-central1-a/instances/dev-auryc-kafka-us-ct1-a-02 --project auryc-development
+
+gcloud compute ssh --tunnel-through-iap projects/auryc-development/zones/us-central1-a/instances/dev-auryc-kafka-us-ct1-a-03 --project auryc-development
+
+gcloud compute ssh --tunnel-through-iap projects/auryc-development/zones/us-central1-a/instances/dev-auryc-kafka-us-ct1-a-01 --project auryc-development
+
+gcloud compute ssh --tunnel-through-iap projects/auryc-development/zones/us-central1-a/instances/dev-auryc-airflow-us-ct1-a-01 --project auryc-development
+
+gcloud compute start-iap-tunnel projects/auryc-development/zones/us-central1-a/instances/dev-auryc-windows-us-ct1-a-01 3389 --local-host-port=localhost:8080 --zone=us-central1-a
+
+
+gcloud compute ssh --zone "us-central1-a" "dev-auryc-kafka-us-ct1-a-04" --tunnel-through-iap --project "auryc-development"
+
+gcloud compute ssh --zone "us-central1-a" "dev-auryc-kafka-us-ct1-a-05" --tunnel-through-iap --project "auryc-development"
+
+gcloud compute ssh --zone "us-central1-a" "dev-auryc-kafka-us-ct1-a-06" --tunnel-through-iap --project "auryc-development"
+
+
+===========================================================================================================
+username: searce
+password: (O;R:i[u,<V[1Pp
+
+username: searce_user
+password: w$dsqMx#qQE[o7n
+
+
+zookeeper.connect=10.3.2.1:2181,10.3.2.2:2181,10.3.2.3:2181
+
+export ZK_HOSTS="10.3.2.1:2181,10.3.2.2:2181,10.3.2.3:2181"
+
+
+auryc-admin
+SWUL3OA7Dl9Q1keA
+
+
+Zookeeper version: 3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03, built on 06/29/2018 00:39 GMT
+
+
+http://35.222.222.161:8080/admin/
+=========================================================================================================================
+this command to ensure your script is added to the boot sequence:
+
+sudo update-rc.d /etc/init.d/dockercompose.sh defaults
+
+
+script executable using the +x option with chmod:
+
+chmod +x /etc/init.d/dockercompose.sh
+
+
+
+sudo update-rc.d dockercompose.sh defaults
+
+=========================================================================================================================
+
+docker run -d --restart always 133d5caf20f6
+docker run -d --restart always b5fd925a3636
+
+bin/kafka-manager -Dconfig.file=/root/CMAK-1.3.3.22/conf/application.conf
+
+=====================================================================================================================
+
+
+SSH command dev-auryc-kafka-us-ct1-a-04:
+gcloud compute ssh --zone "us-central1-a" "dev-auryc-kafka-us-ct1-a-04" --tunnel-through-iap --project "auryc-development"
+IP: 10.3.2.4
+
+SSH command dev-auryc-kafka-us-ct1-a-05: 
+gcloud compute ssh --zone "us-central1-a" "dev-auryc-kafka-us-ct1-a-05" --tunnel-through-iap --project "auryc-development"
+IP: 10.3.2.5
+
+SSH command dev-auryc-kafka-us-ct1-a-06: 
+gcloud compute ssh --zone "us-central1-a" "dev-auryc-kafka-us-ct1-a-06" --tunnel-through-iap --project "auryc-development"
+IP: 10.3.2.6  
+
+====================================================================
+ethtool -i eth0
+sudo echo "MTU=9000" | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth0
+sudo setenforce 0
+sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+
+sudo yum update -y
+sudo yum install gcc gcc-c++ openssl openssl-devel autoconf automake vim-enhanced net-tools bind-utils wget telnet ftp sysstat iotop libevent libevent-devel unzip tar tcpdump wget iperf3 -y
+
+sudo yum install java-latest-openjdk java-latest-openjdk-devel -y
+
+============================================================
+
+hostnamectl set-hostname znode1
+exec bash
+hostnamectl set-hostname znode2
+exec bash
+hostnamectl set-hostname znode3
+exec bash
+=======
+vi /etc/hosts
+
+10.128.15.228 znode1
+10.128.15.229 znode2
+10.128.15.230 znode3
+
+
+
+=================================================
+tickTime=2000
+dataDir=/var/lib/zookeeper
+clientPort=2181
+initLimit=5
+syncLimit=2
+server.1=10.128.15.228:2888:3888
+server.2=10.128.15.229:2888:3888
+server.3=10.128.15.230:2888:3888
+
+
+
+    6  wget https://downloads.apache.org/zookeeper/zookeeper-3.4.14/zookeeper-3.4.14.tar.gz
+    7  hostnamectl set-hostname znode1
+    8  hostnamectl set-hostname znode3
+    9  exec bash
+   10  tar -xvf tar zookeeper-3.4.14.tar.gz
+   11  ls
+   12  tar -xvf zookeeper-3.4.14.tar.gz
+   13  ls
+   14  mv zookeeper-3.4.14 zookeeper
+   15  clear
+   16  mkdir /var/lib/zookeeper;mkdir /var/log/zookeeper
+   17  echo '3' > /var/lib/zookeeper/myid
+
+============================================================================================================
+
+
+
+10.3.2.4 dev-auryc-kafka-us-ct1-a-04
+10.3.2.5 dev-auryc-kafka-us-ct1-a-05
+10.3.2.6 dev-auryc-kafka-us-ct1-a-06]
+
+10.3.2.4:9092,10.3.2.5:9092,10.3.2.6:9092
+
+10.3.2.4:2181,10.3.2.5:2181,10.3.2.6:2181
+
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server 10.3.2.4:9092,10.3.2.5:9092,10.3.2.6:9092 --topic test --from-beginning
+
+
+/opt/kafka/bin/kafka-console-producer.sh --broker-list l10.3.2.4:9092,10.3.2.5:9092,10.3.2.6:9092 --topic test
+
+
+192.168.0.34:2181,192.168.0.36:2181,192.168.0.37:2181
+
+
+echo $JMX_PORT
+echo $KAFKA_JMX_OPTS
+echo $KAFKA_HEAP_OPTS
+=================================================================
+
+
+cd /opt/
+ethtool -i eth0
+sudo echo "MTU=9000" | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth0
+sudo setenforce 0
+sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+sudo yum update -y
+sudo yum install gcc gcc-c++ openssl openssl-devel autoconf automake vim-enhanced net-tools bind-utils wget telnet ftp sysstat iotop libevent libevent-devel unzip tar tcpdump wget iperf3 -y
+sudo yum install dnf -y
+sudo dnf install java-11-openjdk -y
+java -version
+
+
+sudo yum install -y yum-utils
+sudo yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum-config-manager --enable docker-ce-nightly
+sudo yum-config-manager --enable docker-ce-test
+sudo yum-config-manager --disable docker-ce-nightly
+sudo yum install docker-ce docker-ce-cli containerd.io
+sudo systemctl start docker
+
+
+
+sudo vim /etc/sysctl.d/99-sysctl.conf
+sudo sysctl -p
+sudo vim /etc/security/limits.d/20-nproc.conf
+sudo sysctl -p
+
+
+/opt/kafka/bin/kafka-topics.sh --create --zookeeper 10.3.2.1:2181,10.3.2.2:2181,10.3.2.3:2181 --replication-factor 1 --partitions 1 --topic sushant
+/opt/kafka//bin/kafka-topics.sh --zookeeper 10.3.2.1:2181,10.3.2.2:2181,10.3.2.3:2181 --delete --topic quickstart-events
+
+===============================================================================================================
+
+10.3.2.1:9092,10.3.2.2:9092,10.3.2.3:9092,10.3.2.4:9092,10.3.2.5:9092
+10.3.2.1:2181,10.3.2.2:2181,10.3.2.3:2181,10.3.2.4:2181,10.3.2.5:2181
+
+
+/opt/kafka/bin/kafka-topics.sh --list --zookeeper 10.3.2.1:2181,10.3.2.2:2181,10.3.2.3:2181,10.3.2.4:2181,10.3.2.5:2181
+
+/opt/kafka/bin/kafka-topics.sh --create --zookeeper 10.3.2.1:2181,10.3.2.2:2181,10.3.2.3:2181,10.3.2.4:2181,10.3.2.5:2181 --replication-factor 1 --partitions 1 --topic quickstart-events
+
+/opt/kafka/bin/kafka-console-producer.sh --broker-list  10.3.2.1:9092, 10.3.2.2:9092, 10.3.2.3:9092, 10.3.2.4:9092, 10.3.2.5:9092 --topic quickstart-events
+
+
+
+
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server 10.3.2.1:9092, 10.3.2.2:9092, 10.3.2.3:9092, 10.3.2.4:9092, 10.3.2.5:9092  --topic quickstart-events  --from-beginning
