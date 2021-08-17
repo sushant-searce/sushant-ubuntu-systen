@@ -1,0 +1,624 @@
+# Module Configuration
+# This configuration file will be used as the template by the end user to provide / edit the different configurations for the modules
+
+# Date:4-12-2020
+#------------------------------------------------------------------------------------------------------------------------------
+# metadata includes the high level description of the module
+#------------------------------------------------------------------------------------------------------------------------------
+metaData:
+  name: "DataChecker"                              # name of the module 
+  description: "Check for inconsistency in data"   # description of the module 
+  config: default                                  # default or modified
+  version: 1.0                                     # corresponding config file structure version, not user version
+  team: "AI2"                                      # creation team name
+
+#------------------------------------------------------------------------------------------------------------------------------
+# Input section for files and dictionaries
+# Provides default selection options (s3 | MySQL)
+#------------------------------------------------------------------------------------------------------------------------------
+input:
+  source:
+    - filePath: 's3://filepath/file.txt' # S3 file path
+      name: file.txt                     # name of actual file
+      srcType: s3                        # possible values - s3 | MySQL
+      fileType: txt                      # file extension
+      encoding: UTF-8                    # file encoding
+      argName: ipName1                   # argument name for command line
+      actionType: store                  # store is default. use "append" when action="append" is used in argparse only for lambda deployment
+      supportedFormats:                  # supported file extensions
+        - txt
+    - filePath: 's3://filepath/file2.json' # S3 file path
+      name: file2.json                   # name of actual file
+      srcType: s3                        # possible values - s3 | MySQL
+      fileType: txt                      # file extension
+      encoding: UTF-8                    # file encoding
+      argName: ipName2                   # argument name for command line
+      actionType: append                 # store is default. use "append" when action="append" is used in argparse only for lambda deployment
+      supportedFormats:                  # supported file extensions
+        - json
+        - yaml
+  dictionary:
+    - filePath: 's3://filepath/custom_dict1.json' # multiple dictionaries can be present
+      name: custom_dictionary.json        # file path - folder path
+      srcType: s3                         # possibe values - s3                  
+      fileType: json                      # possibe values - csv | tsv | parquet etc
+      encoding: UTF-8                     # encoding types - UTF-8/16
+      argName: dictionaries               # Command line argument file expected by Module
+      supportedFormats:                   # Supported file formats the modules accepts
+        - "json"
+    - filePath: 's3://filepath/custom_dict1.json' # multiple dictionaries can be present
+      name: custom_dict1.json        # file path - folder path
+      srcType: s3                         # possibe values - s3                  
+      fileType: json                      # possibe values - csv | tsv | parquet etc
+      encoding: UTF-8                     # encoding types - UTF-8/16
+      argName: dictionaries               # Command line argument file expected by Module
+      actionType: store
+      supportedFormats:                   # Supported file formats the modules accepts
+        - "json"
+#------------------------------------------------------------------------------------------------------------------------------
+# parameters highly dependent on the module
+#------------------------------------------------------------------------------------------------------------------------------
+functional:
+  # trainable modules and non-trainable modules, same flow is used to create cmd line arguments
+  # if trainable key word is not there, then it's false
+  # if trainable is set to true, then trainable_parameters are only used, process is not used
+  trainable: True
+
+  process:
+    fa1:        # user argument 1
+      dataType: string
+      value: "one"
+    fa2:        # user argument 2
+      dataType: bool   # this is store_true/store_false/store_const style, where value isn't needed
+    fa3:
+      dataType: bool
+      value: True      # although author of module says bool datatype, author is parsing the string, therefore value is needed
+    fa4:
+      dataType: int
+      value: 123
+    fa5:
+      dataType: float
+      value: 0.123
+    fa6:
+      dataType: list[int]  # list of any number of integers (homogenous datatype, variable length)
+      value: [1,2,3]
+    fa6.5:
+      dataType: list[int]  # list of any number of integers (homogenous datatype, variable length)
+      value: [1,2,3]
+    fa7:
+      dataType: list[float,float] # list of any number of integers (homogenous datatype, fixed length)
+      value: [0.123,0.456]
+    #? feasibility check
+    #fa8:
+    #  dataType: list[int,str]
+    #  value: [2,'abc']      # list of int, string (hetrogenous datatype, fixed length)
+    # do note that user can select **only 1** subparser, i.e. subparser1 or subparser2 or subparser3 etc.
+    # therefore only 1 of the branched should be present here.
+    # this is applicable for subsubparser too
+    # the values under each subparser is completely independent
+    subparser1:  # subparser value 1
+      argument1:  # user subparser argument 1
+        dataType: list[string] # list of any number of integers (homogenous datatype, variable length)
+        value: ['abc']         # even if only 1 element is present, if list is mentioned, it should be within square brackets []
+      argument2:  # user subparser argument 2
+        dataType: float
+        value: 3.1415  # all datatypes within process should be supported in subparser
+      subsubparser2:
+        sub_arg_1:
+          dataType: string # all datatypes within process should be supported in every level of subparser
+          value: abc
+        sub_arg_2:
+          dataType: bool
+
+  trainable_parameters:
+    trainable_arg1:  # user argument 1
+      dataType: string
+      value: Text
+    trainable_arg2:  # user argument 1
+      dataType: string
+      value: Label
+    epochs:
+      dataType: int
+      value: 5
+  # every file that should be retained, example for inference, should be kept in a folder and associated with a command line argument
+  retainableFoldersList:
+    - name: model_output    # user argument 1
+      dataType: string
+      value: './model_output'
+    - name: config_output    # user argument 2
+      dataType: string
+      value: './train.config'
+  # if trainable is true and hpo is true, only then aup_config will be used
+  hpo: True
+  aup_config:                        # only when trainable and hpo is true, this is considered
+    config_file:                     # Auptimizer config file
+      dataType: string
+      value: experiment_tf.json
+    cpu:                             # number of cpus to use. If not given, all available cpus will be used
+      dataType: int
+      value: 2
+    script_conversion:               # if this is given, then existing script will be converted to auptimizer script
+      dataType: bool
+      value: False
+    name:                            # Entry script name
+      dataType: string
+      value: tf_example.py
+    function:                        # Entry function with return value (loss or acc.) to the training script
+      dataType: string
+      value: train_mnist
+    dashboard:                       # if dashboard needs to be launched after auptimizer has finished
+      dataType: bool
+      value: True
+    dashboard_time:                  # number of minutes for dashboard. Default is 2 min
+      dataType: int
+      value: 1
+        
+#------------------------------------------------------------------------------------------------------------------------------
+# Includes deployment types, its configs and resource restrictions
+# Indicates where the module has to be deployed
+# ecs- fargate| ecs ec2 | lambda | glue | emr | sagemaker
+#------------------------------------------------------------------------------------------------------------------------------
+deployment:
+  # Glue
+  type: glue
+  config:
+    jobType: gluejob             #  gluejob | mysql_to_mysql | mysql_to_s3
+    dbName: database_name	 #  improvement for next phase(future deployment)   --(not using this parameters in current glue deployment)
+    crawlerName: crawler_name    #  improvement for next phase(future deployment)   --(not using this parameters in current glue deployment)
+    dataTarget: s3://abc         #  improvement for next phase(future deployment)   --(not using this parameters in current glue deployment)
+    jobMaxCapacity: 5
+    jobTimeout: 10
+    jobExecuteType: glueetl
+
+  # EC2
+  # type: ecs-ec2
+  # config:
+  #   launch_type: EC2
+  #   InstanceType : t2.micro        # Choose EC2 instance type
+  #   # for valid combination refer https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size
+  #   CPU: 256                       # CPU required (units) -  choose from 256, 512, and multiple of 1024
+  #   Memory: 512                    # RAM required (MB) - choose from 512, and multiple of 1024 upto 30720
+  
+  # FARGATE
+  # type: ecs
+  # config:
+  #   launch_type: FARGATE
+  #   # for valid combinations refer https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size
+  #   CPU: 256                      # choose from 256, 512, and multiples of 1024
+  #   Memory: 512                   # choose from 512 and multiples of 1024
+  
+  # Lambda
+  # type: function
+  # config:
+  #   name: LambdaName              # name of lambda
+  #   MemorySize: 256               # choose from 256, 512 and multiple of 1024 upto 10240
+  #   runTime: python3.6            # user can select the version
+  #   function_name: main           # entry function name of user's script
+  #   handler: handler.handler_exe  # default
+  
+  # EMR
+  # deployment: 
+  # type: emr
+  # config:
+  #   jobtype: python                             # possibe values - python | scala | jar --> improvement for next phase(future deployment)   --(not using this parameters in current EMR deployment)
+  #   clusterName: emrcluster2                    # The cluster name which can be hardcoded
+  #   releaseLabel: emr-5.31.0                    # EMR release version which can be hardcoded
+  #   # Master instance details
+  #   masterInstanceCount: 1                      # EMR Master instance name which can be hardcoded
+  #   masterInstanceMarket: SPOT                  # User to choose between ON_DEMAND (or) Spot
+  #   masterInstanceName: lgDevEmrMI              # Number of master instance to be launched, user input
+  #   # for supported types, refer https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-supported-instance-types.html
+  #   masterInstanceType: m4.large                # Master instance type, user input
+  #   # Application Type (Spark )
+  #   applicationName: Spark                      # hardcode this value to SPARK
+  #   # Core instance details
+  #   coreInstanceCount: 1                        # Core instance count, user input
+  #   coreInstanceMarket: SPOT                    # User to choose between ON_DEMAND (or) Spot
+  #   coreInstanceName: lgDevEmrCI                # EMR Core instance name it can hardcoded                 
+  #   coreInstanceType: m4.large                  # Core instance type, user  input
+  #   # Task instance details
+  #   taskInstanceCount: 1                        # Core instance count, user input
+  #   taskInstanceMarket: SPOT                    # User to choose between ON_DEMAND (or) Spot
+  #   taskInstanceName: lgDevEmrCI                # EMR task instance name it can hardcoded
+  #   taskInstanceType: m4.large                  # Task instance type, user  input
+
+  # Sagemaker (scenario 1)
+  type: batch_inference
+  config:
+    framework: xgboost        # pytorch | tensorflow | xgboost | chainer | scikit_learn | mx_net
+    instance_count: 1
+    instance_type: ml.p2.xlarge   # https://aws.amazon.com/sagemaker/pricing/
+
+  # Below functional parameters are necessary to run batch tramsform job in Sagemaker (already shared document related to below parameter with proper explanation)
+	  functional:
+	    process:
+	      input_content_type:
+		dataType: string
+		value: <content_type>
+	      input_split_type:
+		dataType: string
+		value: <line or None>
+	      output_assemble_with:
+		 dataType: string
+		value: <line or None>
+	      output_accept:
+		dataType: string
+		value: <output_content_accepted>
+
+#------------------------------------------------------------------------------------------------------------------------------
+# Output section for files
+# Similar to input, UI provides a window for output path/file selection
+#------------------------------------------------------------------------------------------------------------------------------
+output:
+  dest:
+    - name: output1.txt     # name of output file
+      targetType: s3        # possible values - s3
+      fileType: txt         # file type of output file, possibe values - csv | tsv | parquet etc
+      encoding: UTF-8       # encoding of output file
+      filePath: filepath    # s3 file path of output file
+      argName: op1Name      # command line argument associated with output file
+      supportedFormats:     # possible file types for this argument
+        - txt
+    - name: output2.txt     # name of output file
+      targetType: s3        # possible values - s3
+      fileType: txt         # file type of output file
+      encoding: UTF-8       # encoding of output file
+      filePath: filepath    # s3 file path of output file
+      argName: op2Name      # command line argument associated with output file
+      supportedFormats:     # possible file types for this argument
+        - txt
+#------------------------------------------------------------------------------------------------------------------------------
+# includes some general configs
+# lile debug options for whole module, or even specific to modules
+#------------------------------------------------------------------------------------------------------------------------------
+general:
+  debug: no                     # debug to be enabled or not for the whole module
+  level: 1                      # debug level
+  scriptFile: 'data_checker.py' # FileName for script to be run.
+
+#-------**********END OF FUNCTIONAL CONFIGURATION *************---------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------------------------------------------------------
+# UI can look into the below parameters to understand some fundamental configs
+# Only for UI reference, no functional scope
+#------------------------------------------------------------------------------------------------------------------------------
+
+ui:
+    #------------------------------------------------------------------------------------------------------------------------------
+    # corresponding to all functional parameters, options listed for UI
+    #------------------------------------------------------------------------------------------------------------------------------
+    functional:
+      # trainable modules and non-trainable modules, same flow is used to create cmd line arguments
+      # if trainable key word is not there, then it's false
+      # if trainable is set to true, then trainable_parameters are only used, process is not used
+      trainable: True
+
+      process:
+        fa1:        # user argument 1
+          #name: "Data Column"
+          dataType: string
+          #value: abc
+          controlType: dropdown # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          controlValues: ['one', 'two', 'three']
+          defaultValue: "two"
+          #required: True        # by default required is false
+          tip: "parameter for selecting layers"
+        fa2:        # user argument 2
+          dataType: bool   # this is store_true/store_false/store_const style, where value isn't needed
+          controlType: radio # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          defaultValue: True # Variable Present or not
+          tip: "parameter for having vocab or not"
+        fa3:
+          dataType: bool
+          #value: True      # although author of module says bool datatype, author is parsing the string, therefore value is needed
+          controlType: dropdown # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          controlValues: ['True', 'False']
+          defaultValue: True
+          tip: "parameter for train or inference"
+        fa4:
+          dataType: int
+          #value: 123
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+                               # edit box should allow only int 
+          defaultValue: 25
+          tip: "number of epochs"
+        fa5:
+          dataType: float
+          #value: 0.123
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+                               # edit box should allow only numbers (int | float)
+          defaultValue: 0.001
+          tip: "initial learning rate"
+        fa6:
+          dataType: list[int]  # list of any number of integers (homogenous datatype, variable length)
+          #value: [1,2,3]
+          controlType: dropdown-choice # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+                               # dropdown should allow only int
+          controlValues : [1, 2, 3, 4, 5, 6, 7, 8, 9]
+          defaultValue: [3, 4, 5]
+          tip: "top n selections"
+        fa6.5:
+          dataType: list[int]  # list of any number of integers (homogenous datatype, variable length)
+          #value: [1,2,3]
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+                               # dropdown should allow only int
+          defaultValue: [1000, 2055, 9, 100000]
+          tip: "top n selections"
+        fa7:
+          dataType: list[float,float] # list of any number of integers (homogenous datatype, fixed length)
+          #value: [0.123,0.456]
+          controlType: dropdown-choice # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+                               # dropdown should allow only numbers (int | float)
+          defaultValue: [100.0, 2.0, 9, 10, 6.4]
+          tip: "intital weights"
+        #? feasibility check
+        #fa8:
+        #  dataType: list[int,str]
+        #  #value: [2,'abc']      # list of int, string (hetrogenous datatype, fixed length)
+        # do note that user can select **only 1** subparser, i.e. subparser1 or subparser2 or subparser3 etc.
+        # therefore only 1 of the branched should be present here.
+        # this is applicable for subsubparser too
+        # the values under each subparser is completely independent
+        subparser1:  # subparser - not a keyword
+          tip: "subparser for lorem ipsum"
+          argument1:  # user subparser argument 1
+            dataType: list[string] # list of any number of integers (homogenous datatype, variable length)
+            #value: ['abc']         # even if only 1 element is present, if list is mentioned, it should be within square brackets []
+            controlType: dropdown # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+            defaultValue: [abc, def, hig, mnf]
+            tip: "list of layers"
+          argument2:  # user subparser argument 2
+            dataType: float
+            #value: 3.1415  # all datatypes within process should be supported in subparser
+            controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+                                 # edit box should allow only numbers (int | float)
+            required: True
+            tip: "initial config rate"
+          # do note that user can select **only 1** subsubparser, i.e. subsubparser1 or subsubparser2 etc.
+          subsubparser1:    # it is not necessary that only 1 level of subparser will be present
+            tip: "sub sub parser for lorem ipsum"
+            subarg1:
+              dataType: int # all datatypes within process should be supported in every level of subparser
+              #value: 123
+              controlType: choice # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+                                   # edit box should allow only int 
+              controlValues: [10,20,30,40,50]
+              defaultValue: 50
+              tip: "number of epochs"
+            subarg2:
+              dataType: string
+              #value: abc
+              controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+                                   # dropdown should allow only string
+              defaultValue: 'vocab.txt'
+              tip: "embedding filename"
+          subsubparser2:
+            tip: "sub sub parser for foo bar"
+            sub_arg_1:
+              dataType: string # all datatypes within process should be supported in every level of subparser
+              controlType: editbox
+              defaultValue: abc
+            sub_arg_2:
+              dataType: bool
+              controlType: radio
+        # do note that user can select **only 1** subparser, i.e. subparser1 or subparser2 or subparser3 etc.
+        subparser2:
+          tip: "sub parser for def"
+          argument_a:
+            dataType: list[string]
+            controlType: dropdown-choice
+            defaultValue: ['abc']
+            tip: "words to remove"
+          argument_b:
+            dataType: float
+            controlType: editbox
+            required: True
+            tip: "threshold, between 0 and 1"
+        # do note that user can select **only 1** subparser, i.e. subparser1 or subparser2 or subparser3 etc.
+        subparser3:
+          tip: "sub parser for ghi" # having tip like this might be a bad idea *IF TIP* is a argument name
+          argument_a:
+            dataType: list[string]
+            value: ['abc']
+
+      trainable_parameters:
+        trainable_arg1:  # user argument 1
+          dataType: string
+          #value: Text
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          tip: "train file path"
+        trainable_arg2:  # user argument 1
+          dataType: string
+          #value: Label
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          tip: "train label path"
+        epochs:
+          dataType: int
+          #value: 5
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+                               # edit box should allow only int 
+          tip: "number of steps"
+
+      # every file that should be retained, example for inference, should be kept in a folder and associated with a command line argument
+      retainableFoldersList:
+        - name: model_output    # user argument 1
+          dataType: string
+          #value: './model_output'
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          tip: "output file path"
+        - name: config_output    # user argument 2
+          dataType: string
+          #value: './train.config'
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          tip: "model file path"
+          
+      # if trainable is true and hpo is true, only then aup_config will be used
+      hpo: True
+      aup_config:                        # only when trainable and hpo is true, this is considered
+        config_file:                     # Auptimizer config file
+          dataType: string
+          #value: 'experiment_tf.json'
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          defaultValue: experiment_tf.json
+          tip: "Auptomizer config file name"
+        cpu:                             # number of cpus to use. If not given, all available cpus will be used
+          dataType: int
+          #value: 2
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          defaultValue: 2
+          tip: "number of required CPUs"
+        script_conversion:              # if this is given, then existing script will be converted to auptimizer script
+          dataType: bool
+          #value: False
+          controlType: dropdown # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          controlValues: ['True', 'False']
+          defaultValue: False
+          tip: "for HPO auto conversion"
+        name:                            # Entry script name
+          dataType: string
+          #value: 'tf_example.py'
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          defaultValue: tf_example.py
+          tip: "training file name"
+        function:                       # Entry function with return value (loss or acc.) to the training script
+          dataType: string
+          #value: 'train_mnist'
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          defaultValue: train_mnist
+          tip: "entry function name in training script for auptimizer"
+        dashboard:                     # if dashboard needs to be launched after auptimizer has finished
+          dataType: bool
+          #value: True
+          controlType: dropdown # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          controlValues: ['True', 'False']
+          defaultValue: True
+          tip: "To display Auptimizer dashboard"
+        dashboard_time:                 # number of minutes for dashboard. Default is 1 min
+          dataType: int
+          #value: 1
+          controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+          defaultValue: 1
+          tip: "number of minutes to display dashboard"
+            
+    #------------------------------------------------------------------------------------------------------------------------------
+    # Includes deployment types, its configs and resource restrictions
+    # Indicates where the module has to be deployed
+    # ecs (fargate)| ecs-ec2 | function (lambda) | glue | emr | sagemaker
+    #------------------------------------------------------------------------------------------------------------------------------
+    deployment:
+      # Glue
+      - name: "GLUE minimum"
+        tip: "mimimum glue deployment"
+        type: glue
+        config:
+          jobType: gluejob             #  gluejob | mysql_to_mysql | mysql_to_s3
+          dbName: database_name
+          crawlerName: crawler_name
+          dataTarget: s3://abc
+          jobName: lgSearceGlueAddJob
+          jobVersion: v1
+          jobMaxCapacity: 5
+          jobTimeout: 10
+          jobExecuteType: glueet1
+
+      # EC2
+      - name: "EC2 micro"
+        tip: "mimimum EC2 deployment"
+        type: ecs-ec2
+        config:
+          launch_type: EC2
+          InstanceType : t2.micro        # Choose EC2 instance type
+          # for valid combination refer https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size
+          CPU: 256                       # CPU required (units) -  choose from 256, 512, and multiple of 1024
+          Memory: 512                    # RAM required (MB) - choose from 512, and multiple of 1024 upto 30720
+      
+      # EC2
+      - name: "EC2 2xLarge"
+        tip: "medium EC2 deployment"
+        type: ecs-ec2
+        config:
+          launch_type: EC2
+          InstanceType : t2.2xLarge        # Choose EC2 instance type
+          # for valid combination refer https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size
+          CPU: 2048                       # CPU required (units) -  choose from 256, 512, and multiple of 1024
+          Memory: 4096                    # RAM required (MB) - choose from 512, and multiple of 1024 upto 30720
+      
+      # FARGATE
+      - name: "Fargate Deployment"
+        tip: "Fargate deployment"
+        type: ecs
+        config:
+          launch_type: FARGATE
+          # for valid combinations refer https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size
+          CPU: 256                      # choose from 256, 512, and multiples of 1024
+          Memory: 512                   # choose from 512 and multiples of 1024
+      
+      # Lambda
+      - name: "Lambda Deployment"
+        tip: "Lambda function call"
+        type: function
+        config:
+          name: LambdaName              # name of lambda
+          MemorySize: 256               # choose from 256, 512 and multiple of 1024 upto 10240
+          runTime: python3.6            # user can select the version
+          function_name: main           # entry function name of user's script
+          handler: handler.handler_exe  # default
+      
+      # EMR
+      - name: "EMR small"
+        tip: "1master, 1core, 1task nodes"
+        type: emr
+        config:
+          jobtype: python                             # possibe values - python | scala | jar
+          clusterName: emrcluster2                    # The cluster name which can be hardcoded
+          releaseLabel: emr-5.31.0                    # EMR release version which can be hardcoded
+          # Master instance details
+          masterInstanceCount: 1                      # EMR Master instance name which can be hardcoded
+          masterInstanceMarket: SPOT                  # User to choose between ON_DEMAND (or) Spot
+          masterInstanceName: lgDevEmrMI              # Number of master instance to be launched, user input
+          # for supported types, refer https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-supported-instance-types.html
+          masterInstanceType: m4.large                # Master instance type, user input
+          # Application Type (Spark )
+          applicationName: Spark                      # hardcode this value to SPARK
+          # Core instance details
+          coreInstanceCount: 1                        # Core instance count, user input
+          coreInstanceMarket: SPOT                    # User to choose between ON_DEMAND (or) Spot
+          coreInstanceName: lgDevEmrCI                # EMR Core instance name it can hardcoded                 
+          coreInstanceType: m4.large                  # Core instance type, user  input
+          # Task instance details
+          taskInstanceCount: 1                        # Core instance count, user input
+          taskInstanceMarket: SPOT                    # User to choose between ON_DEMAND (or) Spot
+          taskInstanceName: lgDevEmrCI                # EMR task instance name it can hardcoded
+          taskInstanceType: m4.large                  # Task instance type, user  input
+
+      # Sagemaker
+      - name: "Sagemaker Tensorflow"
+        tip: "tensorflow deployment in samemaker"
+        type: sagemaker
+        config:
+          names: toBeDecided
+
+      #Editable version of deployment:
+      # EC2
+      #- name: "EC2 medium"
+      #  tip: "mimimum EC2 deployment"
+      #  type: ecs-ec2
+      #  config:
+      #    #launch_type: EC2               # Can be hardcoded
+      #    InstanceType :                  # Choose EC2 instance type
+      #        dataType: string
+      #        controlType: dropdown # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+      #        controlValues : ['t2.micro', 't2.mini', 't2.nano', 't2.2xlarge']
+      #        defaultValue: 't2.micro'
+      #    # for valid combination refer https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size
+      #    CPU:                            # CPU required (units) -  choose from 256, 512, and multiple of 1024
+      #        dataType: int
+      #        controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+      #        defaultValue: 256
+      #    Memory:                         # RAM required (MB) - choose from 512, and multiple of 1024 upto 30720
+      #        dataType: int
+      #        controlType: editbox # Possible Values are dropdown | radio | choice | dropdown-choice | editbox | checkbox
+      #        defaultValue: 512
+
+#-------**********END OF UI CONFIGURATION *************---------------------------------------------------------------------------

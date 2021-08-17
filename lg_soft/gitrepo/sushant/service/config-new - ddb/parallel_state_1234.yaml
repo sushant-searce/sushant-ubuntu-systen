@@ -1,0 +1,16 @@
+MetaData:
+  name: ParallelInferences
+  description: Do Batch Prediction
+  id: 123e4567-e89b-12d3-a456-426614174000
+  type: parallel
+
+Modules:
+  BatchInference1:
+    ModuleId: 1598592292
+  BatchInference2:
+    ModuleId: 1598592293
+
+inputs:
+  Branch:
+    - Name: BatchInference1
+    - Name: BatchInference2

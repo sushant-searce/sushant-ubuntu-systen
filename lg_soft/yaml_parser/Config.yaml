@@ -1,0 +1,58 @@
+metaData:
+  name: Emr Module
+  description: Emr Job
+  config: default
+  version: 1
+  team: NLP
+input:
+  source:
+    - filePath: s3://testing-input-output-bucket/input/
+      name: tripdata.csv
+      srcType: S3
+      argName: inputfile
+output:
+  dest:
+    - FileName: file_convert.parquet
+      FileSourceType: S3
+      ContentType: Text/CSV/parquet
+      FilePath: ss3://testing-input-output-bucket/output
+      filePath: s3://lppdatasource73424-testtwo/public/DataLoad/Outputs/Outputs1/aa4581af-ea1d-45a9-9266-d0ba3c69637f_output.undefined
+      name: aa4581af-ea1d-45a9-9266-d0ba3c69637f_output.undefined
+      argName: outputfile
+functional:
+  process:
+    # deploy-mode:
+    #   dataType: string
+    #   value: cluster
+    # num-executors:
+    #   dataType: int
+    #   value: 5
+    # executor-cores:
+    #   dataType: int
+    #   value: 5
+    # executor-memory:
+    #   dataType: string
+    #   value: 20g      
+deployment:
+  type: emr
+  config:
+    jobtype: python
+    clusterName: searceLgEmrDevClusterseoul
+    releaseLabel: emr-5.31.0
+    masterInstanceName: lgDevEmrMI
+    masterInstanceCount: 1
+    masterInstanceType: m4.large
+    masterInstanceMarket: SPOT
+    coreInstanceName: lgDevEmrCI
+    coreInstanceCount: 1
+    coreInstanceType: m4.large
+    coreInstanceMarket: SPOT
+    taskInstanceName: lgDevEmrCI
+    taskInstanceCount: 2
+    taskInstanceType: m4.large
+    taskInstanceMarket: SPOT
+    applicationName: Spark
+general:
+  debug: no
+  level: 1
+  scriptFile: emr-test.py

@@ -1,0 +1,9 @@
+MetaData:
+  name: NotifyFailure
+  description: Send a Failure Notification
+  id: 123e4567-e89b-12d3-a456-426614174000
+  type: notify_email
+deployment:
+  TopicArn: ${context['pipeline_execution']['NotificationArn']}
+inputs:
+  Message: Inference Pipeline was a failure.

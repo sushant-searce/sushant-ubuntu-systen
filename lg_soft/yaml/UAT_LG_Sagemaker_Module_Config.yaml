@@ -1,0 +1,29 @@
+metaData:
+  name: BatchInference1
+  description: Sagemaker Model
+  config: default
+  version: 1.0
+  team: "NLP" 
+
+deployment:
+  type: batch_inference
+  config:
+    ArtifactLocation: s3://cdk-modules-s3workflowbaselocationb2150c8a-hr04a6owehy3/model.tar.gz
+    image: 475088953585.dkr.ecr.ap-southeast-1.amazonaws.com/sagemaker-xgboost:1.0-1-cpu-py3
+    model_name: searce-XGBOOST
+    instance_count: 1
+
+input:
+  source:                                           # multiple sources could be present
+    - filePath: 's3://testing-input-output-bucket/input/'   # file path - folder path
+      name: "tripdata.csv"                              # file name
+      srcType: S3                                # possibe values - s3 | local | MySQL
+      type: python                                # possibe values - python | scala | jar
+      argName: "inputfile"
+
+output:
+  dest:
+    - fileName: file_convert.parquet
+      fileSourceType: S3
+      contentType: Text/CSV/parquet
+      filePath: ss3://testing-input-output-bucket/output

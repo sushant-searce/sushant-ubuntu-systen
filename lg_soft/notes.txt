@@ -1,0 +1,297 @@
+CREATE TABLE source.test (PersonID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255), PRIMARY KEY (PersonID) );
+
+INSERT INTO source.test (PersonID, LastName, FirstName, Address, City) VALUES (1, 'singh', 'surya', 'ghansoli', 'mh');
+INSERT INTO source.test (PersonID, LastName, FirstName, Address, City) VALUES (2, 'Jadhav', 'surya', 'ghat', 'mh');
+INSERT INTO source.test (PersonID, LastName, FirstName, Address, City) VALUES (3, 'Nigud', 'snehal', 'bhayender', 'BH');
+INSERT INTO source.test (PersonID, LastName, FirstName, Address, City) VALUES (4, 'Jadhav', 'sagar', 'chembur', 'mh');
+INSERT INTOa source.test (PersonID, LastName, FirstName, Address, City) VALUES (5, 'Nigud', 'sushant', 'ghat', 'mh');
+INSERT INTO source.test (PersonID, LastName, FirstName, Address, City) VALUES (6, 'Jadhav', 'rishabh', 'chembur', 'BH');
+INSERT INTO source.test (PersonID, LastName, FirstName, Address, City) VALUES (7, 'singh', 'sangeeta', 'bhayender', 'mh');
+INSERT INTO source.test (PersonID, LastName, FirstName, Address, City) VALUES (8, 'saxena', 'shiraj', 'chembur', 'RJ');
+INSERT INTO source.test (PersonID, LastName, FirstName, Address, City) VALUES (9, 'singh', 'dhiraj', 'vv', 'AS');
+INSERT INTO source.test (PersonID, LastName, FirstName, Address, City) VALUES (10, 'saxena', 'dhiru', 'bhayender', 'UP');
+
+
+CREATE TABLE source.employee (EmpID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255), PRIMARY KEY (EmpID) );
+
+INSERT INTO source.employee (EmpID, LastName, FirstName, Address, City) VALUES (1, 'singh', 'surya', 'ghansoli', 'mh');
+INSERT INTO source.employee (EmpID, LastName, FirstName, Address, City) VALUES (2, 'Jadhav', 'surya', 'ghat', 'mh');
+INSERT INTO source.employee (EmpID, LastName, FirstName, Address, City) VALUES (3, 'Nigud', 'snehal', 'bhayender', 'BH');
+INSERT INTO source.employee (EmpID, LastName, FirstName, Address, City) VALUES (4, 'Jadhav', 'sagar', 'chembur', 'mh');
+INSERT INTO source.employee (EmpID, LastName, FirstName, Address, City) VALUES (5, 'Nigud', 'sushant', 'ghat', 'mh');
+INSERT INTO source.employee (EmpID, LastName, FirstName, Address, City) VALUES (6, 'Jadhav', 'rishabh', 'chembur', 'BH');
+INSERT INTO source.employee (EmpID, LastName, FirstName, Address, City) VALUES (7, 'singh', 'sangeeta', 'bhayender', 'mh');
+INSERT INTO source.employee (EmpID, LastName, FirstName, Address, City) VALUES (8, 'saxena', 'shiraj', 'chembur', 'RJ');
+INSERT INTO source.employee (EmpID, LastName, FirstName, Address, City) VALUES (9, 'singh', 'dhiraj', 'vv', 'AS');
+INSERT INTO source.employee (EmpID, LastName, FirstName, Address, City) VALUES (10, 'saxena', 'dhiru', 'bhayender', 'UP');
+
+CREATE TABLE source.student (StudentID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255), PRIMARY KEY (StudentID) );
+
+INSERT INTO source.student (StudentID, LastName, FirstName, Address, City) VALUES (1, 'singh', 'surya', 'ghansoli', 'mh');
+INSERT INTO source.student (StudentID, LastName, FirstName, Address, City) VALUES (2, 'Jadhav', 'surya', 'ghat', 'mh');
+INSERT INTO source.student (StudentID, LastName, FirstName, Address, City) VALUES (3, 'Nigud', 'snehal', 'bhayender', 'BH');
+INSERT INTO source.student (StudentID, LastName, FirstName, Address, City) VALUES (4, 'Jadhav', 'sagar', 'chembur', 'mh');
+INSERT INTO source.student (StudentID, LastName, FirstName, Address, City) VALUES (5, 'Nigud', 'sushant', 'ghat', 'mh');
+INSERT INTO source.student (StudentID, LastName, FirstName, Address, City) VALUES (6, 'Jadhav', 'rishabh', 'chembur', 'BH');
+INSERT INTO source.student (StudentID, LastName, FirstName, Address, City) VALUES (7, 'singh', 'sangeeta', 'bhayender', 'mh');
+INSERT INTO source.student (StudentID, LastName, FirstName, Address, City) VALUES (8, 'saxena', 'shiraj', 'chembur', 'RJ');
+INSERT INTO source.student (StudentID, LastName, FirstName, Address, City) VALUES (9, 'singh', 'dhiraj', 'vv', 'AS');
+INSERT INTO source.student (StudentID, LastName, FirstName, Address, City) VALUES (10, 'saxena', 'dhiru', 'bhayender', 'UP');
+
+
+
+
+
+
+
+############################################################################
+
+
+
+
+
+CREATE table source.sample_table (varchar_column VARCHAR( 20 ), tinyint_column TINYINT, text_column TEXT, date_column DATE, smallint_column SMALLINT, mediumint_column MEDIUMINT, int_column INT, bigint_column BIGINT, float_column FLOAT( 10, 2 ), double_column DOUBLE, decimal_column DECIMAL( 10, 2 ), datetime_column DATETIME, timestamp_column TIMESTAMP, time_column TIME, year_column YEAR, char_column CHAR( 10 ),       tinyblob_column TINYBLOB, tinytext_column TINYTEXT, blob_column BLOB, mediumblob_column MEDIUMBLOB, mediumtext_column MEDIUMTEXT,       longblob_column LONGBLOB, longtext_column LONGTEXT, enum_column ENUM( '1', '2', '3' ), set_column SET( '1', '2', '3' ), bool_column BOOL,       binary_column BINARY( 20 ), varbinary_column VARBINARY( 20 ),  PRIMARY KEY (int_column) );
+
+###############################################################################################################
+
+CREATE table source.sample1(varchar_column VARCHAR( 20 ), tinyint_column TINYINT, text_column TEXT, date_column DATE, smallint_column SMALLINT, mediumint_column MEDIUMINT, int_column INT, PRIMARY KEY (int_column) );
+
+INSERT INTO source.sample1(varchar_column, tinyint_column, text_column, date_column, smallint_column, mediumint_column, int_column) VALUES("searcetest", 123, "hello world", "1996-03-07", 32765, 8388606, 1)
+
+tiny int duplicate values are not allowed
+
+#################################################################################################################
+
+CREATE table source.sample2(int_column INT, bigint_column BIGINT, float_column FLOAT( 10, 2 ), double_column DOUBLE, decimal_column DECIMAL( 10, 2 ), datetime_column DATETIME, timestamp_column TIMESTAMP, time_column TIME, year_column YEAR,, PRIMARY KEY (int_column));
+
+INSERT INTO source.sample2(int_column, bigint_column, float_column, double_column, decimal_column, datetime_column, timestamp_column, time_column, year_column) VALUES(1, 9223372036854775806,  1.1, 1000.5, 1.10, '2010-04-30 07:27:39', '2008-01-01 00:00:01', '23:59:59', '0001-01-01', '1990' );
+
+
+
+
+
+------------------------>>>>>>>>>>>>>>>>>>>.------------------------------>>>>>>>>>>>>>>>>>>>>>>.--------------------------------->>>>>>>>>>>>>>>>>>.------
+
+
+
+	  
+INSERT INTO source.sample_table  (varchar_column, tinyint_column, text_column, date_column, smallint_column, mediumint_column, int_column, bigint_column, float_column, double_column, decimal_column, datetime_column, timestamp_column, time_column, year_column, char_column, tinyblob_column, tinytext_column, blob_column, mediumblob_column, mediumtext_column, longblob_column, longtext_column, enum_column, set_column, bool_column, binary_column, varbinary_column)  VALUES("searcetest", 123, "hello world", "1996-03-07", 32765, 8388606, 1, 9223372036854775806,  1.1, 1000.5, 1.10, '2010-04-30 07:27:39', '2008-01-01 00:00:01', '23:59:59', '0001-01-01', '1990', 'sushant', '848016608498FE15C60500010', 'L', '848016608498FE15C6050001000006020007', '848016608498FE15C6050001000006020007002E000005E845019608', 'TEXT', '848016608498FE15C6050001000006020007002E000005E84501960844CFF15C6050001000006020008002E000405E84D002608498FE15C605000100000635080002', 'aaaaaaaaaaaaa', 2, 1, true, '9fad5e9eefdfb449' , 0x12345 )
+
+
+
+(varchar_column, tinyint_column, text_column, date_column, smallint_column, mediumint_column, int_column, bigint_column, float_column, double_column, decimal_column, datetime_column, timestamp_column, time_column, year_column, char_column, tinyblob_column, tinytext_column, blob_column, mediumblob_column, mediumtext_column, longblob_column, longtext_column, enum_column, set_column, bool_column, binary_column, varbinary_column) 
+
+
+
+
+/usr/local/bin:/usr/local/lib
+
+
+######################################################################
+
+
+    column_name     
+--------------------
+ dag_id
+ is_paused
+ is_subdag
+ is_active
+ last_scheduler_run
+ last_pickled
+ last_expired
+ scheduler_lock
+ pickle_id
+ fileloc
+ owners
+ description
+ default_view
+ schedule_interval
+ root_dag_id
+
+UPDATE dag SET is_active = value1, WHERE  dag_id=    
+
+
+UPDATE dag SET is_active = 'f' WHERE  dag_id = 'LG-dynamic-1609934722042';
+
+
+###############################################################################################
+
+End-to-End Multiclass Image Classification Example -->>
+https://sagemaker-examples.readthedocs.io/en/latest/introduction_to_amazon_algorithms/imageclassification_caltech/Image-classification-fulltraining.html
+
+
+Sagemaker with Docker container:
+
+https://docs.aws.amazon.com/sagemaker/latest/dg/docker-containers.html
+
+
+
+
+Bare minimum bring your own model on SageMaker
+https://godatadriven.com/blog/bare-minimum-bring-your-own-model-on-sagemaker/
+
+
+
+https://sagemaker.readthedocs.io/en/stable/
+
+
+https://sagemaker-examples.readthedocs.io/en/latest/sagemaker_batch_transform/index.html
+
+
+
+TensorFlow BYOM: Train locally and deploy on SageMaker.
+
+https://sagemaker-examples.readthedocs.io/en/latest/advanced_functionality/tensorflow_iris_byom/tensorflow_BYOM_iris.html
+
+
+Use Your Own Inference Code with Amazon SageMaker XGBoost Algorithm
+
+https://sagemaker-examples.readthedocs.io/en/latest/introduction_to_amazon_algorithms/xgboost_abalone/xgboost_inferenece_script_mode.html
+
+
+ragu document:-
+
+https://sagemaker.readthedocs.io/en/stable/frameworks/tensorflow/using_tf.html#deploying-directly-from-model-artifacts
+
+
+
+
+
+
+
+
+
+
+
+===========================================================
+
+
+https://github.com/aws/amazon-sagemaker-examples/blob/master/advanced_functionality/xgboost_bring_your_own_model/xgboost_bring_your_own_model.ipynb
+
+https://sagemaker.readthedocs.io/en/stable/frameworks/xgboost/using_xgboost.html
+
+
+
+https://sagemaker.readthedocs.io/en/stable/workflows/airflow/using_workflow.html
+
+
+
+#####################################################################################################
+
+
+
+module  --->  branch_first ---> release 2
+
+
+custom_module  ---> new_branch_first --->  release 1
+
+
+code nahi likhna hai
+just provide API....
+
+
+link
+
+
+dags_status_json -
+
+
+error {"DAG "lg-dynamic-1234" is broken DAG"}
+
+
+return {
+		status:400,
+		message: "DAG "lg-dynamic-1234" is broken DAG"
+		}
+
+
+min
+
+
+3-4 secs
+
+
+git branch -c master clone1
+git push origin clone2
+
+
+ck9BfjmiUok-kGuLJWny
+api access:   -y4QojHZW9y9T6PQmojz
+all access:    Vaz_G4qRBtZ5Z2eNnQFy
+
+5d52a091c45649c6
+4985ab2d687fc170
+2644ec3ac9411ddc
+107077eceeaa67fd
+5a2e792b27548ddc
+a868d1a17c085fdd
+7bb75a0e21e29fcc
+79f95bcad2f8151a
+d075e48a01c48151
+056605163e83cab5
+
+
+
+
+
+#########################################################
+
+
+part 1
+
+git clone  to particular directory
+
+/mnt/<execution_id>/ <git_files>
+
+
+part 2
+
+upload files in above directory to a specified location -->>
+
+boto3 library to upload files
+
+
+#########################################################
+
+PAST
+
+lambda ->
+subnet 
+ek private
+ek public
+
+Efs ->
+subnet
+ek private
+ek public
+
+
+Issue ->   Traffic to public subnet was not accepted.
+			   only private subnet traffic was accepted.
+
+----------------------------->>
+
+PRESENT
+
+lambda ->
+subnet 
+ek private
+ek private
+
+Efs ->
+subnet
+ek public
+ek public
+
+
+
+
+
+https://www.tutorialspoint.com/How-are-files-extracted-from-a-tar-file-using-Python#:~:text=You%20can%20use%20the%20tarfile,method%20of%20the%20tarfile%20module.
+
+
+
+##################################################################################
+
+
+

@@ -1,0 +1,46 @@
+pipeline {
+    
+    agent any
+    
+  options {
+      buildDiscarder(logRotator(numToKeepStr: '10'))
+      disableConcurrentBuilds()
+  }
+    
+    environment {
+        registryUrl = "https://925881846319.dkr.ecr.us-east-1.amazonaws.com/workflowengine/service"
+        registry = "925881846319.dkr.ecr.us-east-1.amazonaws.com/workflowengine/service"
+        registryCredential = 'ecr:us-east-1:ecr-cred-lgx'
+        dockerImage = ''
+        tag = 'latest'   
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+                dockerImage = docker.build registry + ":latest"
+                }
+            }
+        }
+        stage('Push image') {
+            steps {
+                script {
+                docker.withRegistry( registryUrl, registryCredential ) {
+                dockerImage.push()
+                }
+            }
+        }
+    }
+        stage('Remove Unused docker image') {
+            steps {
+                sh "docker rmi $registry:latest"
+            }
+        }        
+    }
+}

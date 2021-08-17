@@ -1,0 +1,51 @@
+metaData:
+  config: default
+  description: Emr Job                      
+  name: Emr Module
+  team: NLP
+  version: 1
+input:
+  source:
+    - argName: inputfile
+      filePath: s3://lppdatasource73424-testtwo/batch_data_cleansed.csv  # Input file location
+      name: batch_data_cleansed.csv                                      # Only CSV file is supported because script which we are running convers CSV (input) to Parquet (output)
+      srcType: S3  
+      fileType: csv  
+output:
+  dest:
+    - fileType: txt
+      filePath: s3://lppdatasource103424-devthree/public/DataLoad/Outputs/Outputs1/1ebb8658-1aff-4ffb-b2fb-811166212ad0_output.txt
+      name: 1ebb8658-1aff-4ffb-b2fb-811166212ad0_output.txt
+      srcType: S3
+      argName: outputfile                                                 
+functional:
+  process:
+    somevariable:
+      dataType: string
+      value: lgdemocluster
+deployment:
+  type: emr
+  config:
+    clusterName: searceLgEmrDevClustersingapore
+    releaseLabel: emr-5.31.0 
+    #Master instance details
+    masterInstanceCount: 1
+    masterInstanceMarket: SPOT
+    masterInstanceName: lgDevEmrMI
+    masterInstanceType: m4.large
+    # Application Type (Spark )
+    applicationName: Spark
+    #Core instance details
+    coreInstanceCount: 1
+    coreInstanceMarket: SPOT
+    coreInstanceName: lgDevEmrCI              
+    coreInstanceType: m4.large
+    #Task instance details
+    taskInstanceCount: 1
+    taskInstanceMarket: SPOT
+    taskInstanceName: lgDevEmrCI
+    taskInstanceType: m4.large
+general:
+  debug: no
+  level: 1
+  scriptFile: emr-test.py

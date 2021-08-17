@@ -1,0 +1,11 @@
+MetaData:
+  Name: "Example"
+
+Deployment:
+  ArtifactLocation: Example
+
+Inputs:
+  FilePaths: ""
+
+Outputs:
+  FilePaths: ""

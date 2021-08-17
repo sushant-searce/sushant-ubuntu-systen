@@ -1,0 +1,41 @@
+metaData:
+  name: "Glue Module"
+  description: "Glue Job"
+  config: default
+  version: 1.0
+  team: "NLP"
+input:
+  source:
+    - filePath: 's3://lppdatasource103424-devthree/'
+      name: "batch_data_cleansed.csv" 
+      srcType: S3     
+      argName: "inputfile"
+      fileType: csv  
+output:
+  dest:
+    - fileName: file_convert.parquet
+      srcType: S3
+      fileType: txt
+      filePath: s3://testing-input-output-bucket/output-glue
+      argName: outputfile 
+functional:
+  process:
+    somevariable:
+      dataType: string
+      value: lgdemocluster
+deployment: 
+  type: glue
+  config:    
+    jobType: gluejob                    #mysql_to_mysql | mysql_to_s3 | gluejob 
+    dbName: database_name               #future deployment  
+    crawlerName: crawler_name                    #future deployment  
+    dataTarget: s3 path of data                #future deployment  
+    jobName: lgSearceGlueAddJob                 
+    jobVersion : v1
+    jobMaxCapacity : 5
+    jobTimeout : 10
+    jobExecuteType : glueetl
+general:
+  debug: no
+  level: 1
+  scriptFile: gluescript.py

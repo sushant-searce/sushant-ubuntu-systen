@@ -1,0 +1,21 @@
+MetaData:
+  name: BatchInference2
+  description: Predict Result using model 1
+  id: 123e4567-e89b-12d3-a456-426614174000
+  type: batch_inference
+deployment:
+  ArtifactLocation: https://sagemaker-mlops-demo-lg-jul-2020.s3.ap-south-1.amazonaws.com/model.tar.gz
+  image: xgboost
+  model_name: XGBOOST-BreastCancerPrediction
+  instance_count: 1
+inputs:
+  FilePath: ${context['step_execution']['DataLoader'].output()['Payload']['s3_output_location']}
+  FileSourceType: S3
+  ContentType: text/csv
+
+outputs:
+  dest:
+    FileName: batch_data_cleansed
+    FileSourceType: S3
+    ContentType: Text/CSV
+    FilePath: s3://sagemaker-mlops-demo-lg-jul-2020/output2

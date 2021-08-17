@@ -1,0 +1,60 @@
+functional:
+  process:
+    mysql_source_endpoint:
+      dataType: string
+      value: <source_endpoint>            # Hostname of the publicly accessible RDS. (source RDS) 
+    mysql_source_port:
+      dataType: string
+      value: <mysql_source_db_port>       # MySQL RDS port.(3306)
+    mysql_source_host_username:
+      dataType: string
+      value: <username>                   # Username of source Mysql RDS.
+    mysql_source_host_password:
+      dataType: string
+      value: <password>                   # Password of source Mysql RDS.
+    source_database:
+      dataType: string
+      value: <database_name>              # Database name from which you want to trasfer/load data.
+    source_table:
+      dataType: string
+      value: <source_table_name>          # Name of the Table user want to transfer to destination Database. 
+    mysql_destination_endpoint:
+      dataType: string
+      value: <destination_endpoint>       # Hostname of the publicly accessible Target RDS. (Destination/Target RDS) 
+    mysql_destination_port:
+      dataType: string
+      value: <mysql_destination_db_port>  # MySQL RDS port.(3306)
+    mysql_destination_host_username:
+      dataType: string
+      value: <username>                    # Username of target/destination Mysql RDS.
+    mysql_destination_host_password:
+      dataType: string
+      value: <password>                    # Password of target/destination Mysql RDS.
+    destination_database:
+      dataType: string
+      value: <destination_database_name>   # Database name of target RDS to which user want to load data.
+    destination_table:
+      dataType: string
+      value: <destination_table_name>      # Name of the table where user want to load data.(New table -> Glue creates new table, no need to create any schema)
+    columns:
+      dataType: string
+      value: [column1, column2, column3, column4]   # list of column names user wants to load into target database/table. 
+
+deployment: 
+  type: dataloader
+  config:  
+    jobType: mysql_to_mysql                    # mysql_to_mysql | mysql_to_s3 | gluejob 
+    awsAccount : different                     # can be hard coded for dataloader with different aws acount
+    dbName: database_name                      # future deployment  
+    crawlerName: crawler_name                  # future deployment  
+    dataTarget: s3 path of data                # future deployment  
+    jobName: lgSearceGlueAddJob                 
+    jobVersion : v1
+    jobMaxCapacity : 10
+    jobTimeout : 60
+    jobExecuteType : glueetl
+
+general:
+  debug: no
+  level: 1
+  scriptFile: mysqlgluescriptv2.py      # Glue Dataloader scripts which is used to transfer/load data from one RDS to another.

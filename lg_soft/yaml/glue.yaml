@@ -1,0 +1,57 @@
+# Module Configuration
+# This configuration file will be used as the template by the end user to provide / edit the different configurations for the modules
+
+# Date:4-12-2020
+#------------------------------------------------------------------------------------------------------------------------------
+# metadata includes the high level description of the module
+#------------------------------------------------------------------------------------------------------------------------------
+metaData:
+  name: "Glue Module"                            # name of the module 
+  description: "Glue Job"    # description of the module 
+  config: default                                  # default or modified
+  version: 1.0                                     # corresponding config version
+  team: "NLP"                                      # creation team name
+
+#------------------------------------------------------------------------------------------------------------------------------
+# provides default selection options (s3 | local | MySQL)
+input:
+  source:                                           # multiple sources could be present
+    - filePath: 's3://lppdatasource103424-devthree/'   # file path - folder path
+      name: "batch_data_cleansed.csv"                              # file name
+      srcType: S3                                   # possibe values - s3 | local | MySQL
+      argName: "inputfile"                          #Command line argument file expected by Module
+
+output:
+  dest:
+    - fileName: file_convert.parquet
+      fileSourceType: S3
+      contentType: Text/CSV/parquet
+      filePath: s3://testing-input-output-bucket/output-glue
+
+#------------------------------------------------------------------------------------------------------------------------------
+# - parameters highly dependent on the module
+# - modules can split them into preprocessing/ processing/ post processing
+#------------------------------------------------------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------------------------------------------------------
+# Includes deployment types, its configs and resource restrictions
+# Indicates where the module has to be deployed
+# ecs- fargate| ecs ec2 | lambda | glue | emr | sagemaker
+#------------------------------------------------------------------------------------------------------------------------------
+deployment: 
+  type: glue
+  config:    
+    dbName: abc 
+    crawlerName: abc
+    dataTarget: s3://abc
+    jobName: lgSearceGlueAddJob                 
+    jobVersion : v1
+    jobMaxCapacity : 5
+    jobTimeout : 10
+    jobExecuteType : glueetl
+    jobScriptLocation:  s3://testing-input-output-bucket/files/gluescript.py
+
+general:
+  debug: no
+  level: 1
+  scriptFile: gluescript.py

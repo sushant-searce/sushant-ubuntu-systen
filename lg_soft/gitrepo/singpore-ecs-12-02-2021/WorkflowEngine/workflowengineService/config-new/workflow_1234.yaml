@@ -1,0 +1,39 @@
+MetaData:
+  name: SentimentAnalyzer
+  description: This Pipeline is used for analyzing customer reviews .
+  type: BatchInferencePipeline
+  config: default
+  version: 2020-08
+  team: Data Science
+
+Modules:
+  DataLoader:
+    ModuleId: data_loader_1234
+  CompareResults:
+    ModuleId: ecs_1234
+  ParallelInferences:
+    ModuleId: parallel_state_1234
+  NotifyResults:
+    ModuleId: choice_1234
+
+Steps:
+  DataLoader:
+    Next: ParallelInferences
+  ParallelInferences:
+    Next: CompareResults
+  CompareResults:
+    Next: NotifyResults
+  NotifyResults:
+    End: True
+
+general:
+  log:
+    - dest:
+        FilePath: s3://sagemaker-mlops-demo-lg-jul-2020
+        FileSourceType: S3
+  debug: yes
+  notification:
+    onSuccess:
+      - none
+    onFailure:
+      - email

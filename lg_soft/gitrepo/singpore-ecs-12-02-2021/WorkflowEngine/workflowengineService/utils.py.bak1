@@ -1,0 +1,418 @@
+"""
+Takes in a dict and returns a dict with placeholders replaced from the context.
+"""
+import uuid
+from datetime import datetime
+
+import boto3
+from boto3.dynamodb.conditions import Key, Attr
+
+import constants
+import yaml
+import time
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table(constants.DYNMODB_TABLE)
+s3 = boto3.resource('s3')
+s3client = boto3.client('s3')
+key_name = 'cfn_template.yaml'
+region = s3client.meta.region_name
+s3bucket_name = constants.SC_S3_BUCKET
+sc_portfolio_id = constants.SC_PORTFOLIO_ID
+
+def generate_temp_config(ModuleID, config_string):
+    timestamp = str(uuid.uuid1())
+    config_key = "public/modules/"+ModuleID+"/TempConfig/tempconfig-"+timestamp+".yaml"
+    testconfigpath = "s3://"+s3bucket_name+"/"+config_key
+    s3_upload = s3client.put_object(Bucket=s3bucket_name,Key=config_key, Body=config_string)
+    return testconfigpath
+
+def fetch_config_from_db(config_id, type):
+    key = {
+        "id": int(config_id),
+        "type": type
+    }
+    response = table.get_item(Key=key)
+    config_string: str = ""
+    if type == constants.WORKFLOW_CONFIG_VERSION:
+        config_string = response['Item'].get('workflowVersionConfig')
+    else:
+        config_string = response['Item'].get('moduleConfig')
+
+    return yaml.full_load(config_string)
+
+def fetch_module_config_from_db(module_id, workflow_version_id):
+    key = {
+        "id": int(workflow_version_id),
+        "type": constants.WORKFLOW_CONFIG_VERSION
+    }
+    response = table.get_item(Key=key, ProjectionExpression='workflowVersionModules')['Item']['workflowVersionModules']
+    config_string = next((item for item in response if item['id'] == module_id), None)['moduleConfig']
+    platformModuleId = next((item for item in response if item['id'] == module_id), None)['platformModuleId']
+    return {'config': yaml.full_load(config_string),
+            'config_string': config_string,
+            'platformModuleId': platformModuleId}
+
+def fetch_config_from_s3(s3_location):
+    bucket_name = s3_location.split('/')[2]
+    key = '/'.join(s3_location.split('/')[3:])
+
+    s3resource = boto3.resource('s3')
+    object = s3resource.Object(bucket_name, key)
+    config_string = object.get()['Body'].read().decode('utf-8')
+
+    return yaml.full_load(config_string)
+
+# TODO: Need to iterate the Parallel Stack and Choice Stack and get the Modules referred there!
+def fetch_deployment_config(workflow_version_id):
+    deployment_config = []
+    workflow_yaml = fetch_config_from_db(workflow_version_id, constants.WORKFLOW_CONFIG_VERSION)
+    modules = workflow_yaml['Modules']
+    for module in modules.items():
+        temp_deployment_config = {}
+
+        module_id = module[1].get('ModuleId')
+        #config_location = module[1].get('ConfigLocation') # Only needed when yaml is in S3
+        module_config = fetch_module_config_from_db(module_id, workflow_version_id).get('config')
+        module_deployment_config = module_config.get('deployment') or module_config.get('Deployment')
+        module_meta_data = module_config.get("MetaData")
+
+        temp_deployment_config['config'] = module_deployment_config
+        temp_deployment_config['type'] = module_deployment_config['type']
+        temp_deployment_config['name'] = module_meta_data['name']
+        deployment_config.append(temp_deployment_config)
+
+    return {"deployments":deployment_config}
+
+
+def save_workflow_definition(config_id, definition, template, html):
+    key = {
+        "id": int(config_id),
+        "type": constants.WORKFLOW_CONFIG_VERSION
+    }
+    response = table.get_item(Key=key)['Item']
+    response['workflowVersionASLDef'] = str(definition)
+    response['workflowVersionCFNTemplate'] = template
+    response['workflowVersionGraphSVG'] = html
+    response['creation_status'] = "CREATED"
+    table.put_item(Item=response)
+    return True
+
+
+def publish(template_value, workflow_version_id):
+    key = {
+        "id": int(workflow_version_id),
+        "type": constants.WORKFLOW_CONFIG_VERSION
+    }
+    workflow_version_properties = table.get_item(Key=key)['Item']
+
+    s3.Object(s3bucket_name, key_name).put(Body=template_value)
+    s3_url=f'https://{s3bucket_name}.s3.{region}.amazonaws.com/{key_name}'
+    client = boto3.client('servicecatalog')
+    create_product_response = client.create_product(
+        Name=workflow_version_properties.get('workflowVersionDescription')+str(datetime.now()),
+        Owner=workflow_version_properties.get('userRole'),
+        Description=workflow_version_properties.get('workflowVersionDescription'),
+        SupportEmail='test@support.com',
+        ProductType='CLOUD_FORMATION_TEMPLATE',
+        ProvisioningArtifactParameters={
+            'Name': 'InitialCreation',
+            'Description': 'InitialCreation',
+            'Info': {
+                'LoadTemplateFromURL': s3_url
+            },
+            'Type': 'CLOUD_FORMATION_TEMPLATE'
+        },
+        IdempotencyToken=str(uuid.uuid4())
+    )
+    response = client.associate_product_with_portfolio(
+        ProductId=create_product_response['ProductViewDetail']['ProductViewSummary']['ProductId'],
+        PortfolioId=sc_portfolio_id
+    )
+    client.associate_service_action_with_provisioning_artifact(
+        ProductId=create_product_response['ProductViewDetail']['ProductViewSummary']['ProductId'],
+        ProvisioningArtifactId=create_product_response['ProvisioningArtifactDetail']['Id'],
+        ServiceActionId='act-yy3sbkqpyjmqy'
+    )
+    return response
+
+
+def resolvePipelineVariables(input, context):
+    expr, append_string = input.split("}")
+    expr = expr.strip("${").strip("}")
+    return eval(expr) + append_string
+
+
+def resolveStepVariables(input, context):
+    # expr = input.strip("${").strip("}")
+    return "$"+input.split('output()')[1].strip("}""")
+
+
+def evaluateChoiceVariables(input, context):
+    # expr, append_string = input.split("}")
+    # expr = expr.strip("${").strip("}")
+    # attribute = append_string.split('[', 1)[1].split(']')[0].strip("'")
+    return resolveStepVariables(input,context)+['StatusCode']
+
+
+def resolvePlaceHolderValues(value, context):
+    if value.find("pipeline_execution") > -1:
+        return resolvePipelineVariables(value, context)
+    elif value.find("step_execution") > -1:
+        return resolveStepVariables(value, context)
+    else:
+        return value
+
+
+def resolvePlaceHoldersDict(parameters, context):
+    out_parameters = {}
+    for k, v in parameters.items():
+        try:
+            if type(v) == str and v.find("pipeline_execution") > -1:
+                out_parameters[k] = resolvePipelineVariables(v, context)
+
+            elif type(v) == str and v.find("step_execution") > -1:
+                out_parameters[k+".$"] = resolveStepVariables(v, context)
+            else:
+                out_parameters[k] = v
+        except:
+            print('Exception while Replacing Parameters..')
+            raise Exception("One or more of the input params in the yaml definition was wrong")
+
+    return out_parameters
+
+
+def check_and_update_create_status(workflow_version_id, status):
+    key = {
+        "id": int(workflow_version_id),
+        "type": constants.WORKFLOW_CONFIG_VERSION
+    }
+    response = table.get_item(Key=key)['Item']
+    if (response.get('creation_status') == 'RUNNING'):
+        response['creation_status'] = 'RUNNING'
+        table.put_item(Item=response)
+        return True
+    else:
+        return False
+
+
+def fetch_workflow_svg(workflow_id):
+    key = {
+        "id": int(workflow_id),
+        "type": constants.WORKFLOW_CONFIG_VERSION
+    }
+    response = table.get_item(Key=key)['Item']
+    return response.get('workflowVersionGraphSVG')
+
+
+def ordered_config(config):
+    ordered_step = []
+
+    for k, v in config.items():
+        if (v.get('Start') == 'True'):
+            ordered_step.insert(0, (k, v))
+
+    lookout = True
+    next = ordered_step[0][1].get('Next')
+    if next:
+        while lookout:
+            next_step = config.get(next)
+            if (next_step.get('End') == 'True'):
+                ordered_step.append((next, next_step))
+                lookout = False
+                break
+            ordered_step.append((next, next_step))
+            next = next_step.get('Next')
+
+    response = {}
+    for step in ordered_step:
+        response[step[0]] = step[1]
+
+    return response
+
+
+def check_and_update_execution_status(workflow_version_id):
+    # Get the Execution Status
+    items = table.query(
+        KeyConditionExpression=Key('type').eq('workflowExecution'),
+        FilterExpression=Attr('parent').eq((workflow_version_id)) & Attr('execution_status').eq('RUNNING')
+    )['Items']
+
+    # Allow only one running execution at a time.
+    if len(items) < 1:
+        workflow_execution_version_id = round(time.time() * 1000)
+        table.put_item(Item={
+            "id": int(workflow_execution_version_id),
+            "type": constants.WORKFLOW_EXECUTION_VERSION,
+            "userName": "admin",
+            "parent": int(workflow_version_id),
+            "execution_status": "INITIALIZING"
+        })
+        return workflow_execution_version_id
+    else:
+        return False
+
+
+def save_execution_results_in_db(workflow_execution_id, html, execution_arn,template):
+    key = {
+        "id": int(workflow_execution_id),
+        "type": constants.WORKFLOW_EXECUTION_VERSION
+    }
+    response = table.get_item(Key=key)['Item']
+    response['executionVersionGraphSVG'] = html
+    response['execution_arn'] = execution_arn
+    response['workflowVersionCFNTemplate'] = template
+    response['execution_status'] = 'COMPLETED'
+    table.put_item(Item=response)
+
+    return True
+
+
+def get_execution_arn(workflow_version_id, workflow_execution_id):
+    key = {
+        "id": int(workflow_execution_id),
+        "type": constants.WORKFLOW_EXECUTION_VERSION
+    }
+    response = table.get_item(Key=key)['Item']
+    return response.get('execution_arn')
+
+def get_container_uri(module_id):
+    key = {
+        "id": int(module_id),
+        "type": 'customModule'
+    }
+    response = table.get_item(Key=key)['Item']
+    container_uri = response.get('DockerECRURI') + ':'+ response.get('ContainerName').split(':')[0][:-7]
+    return container_uri
+
+def update_ecs_task(container_uri):
+    task_name = constants.LPP_FARGATE_TASK_DEF #definition.get("config").get("Name")
+    #cpu = definition.get("config").get("Cpu")
+    #memory = definition.get("config").get("Memory")
+
+    client = boto3.client('ecs')
+
+    response = client.register_task_definition(
+        family=task_name,
+        taskRoleArn=constants.TASK_EXECUTION_ROLE,
+        executionRoleArn=constants.TASK_EXECUTION_ROLE,
+        requiresCompatibilities=['FARGATE'],
+        cpu='1024', #cpu
+        memory='2048', #memory
+        networkMode='awsvpc',
+        containerDefinitions=[
+            {
+                'name':'container1',
+                'image':constants.STARTER_STOPPER,
+                'essential':False,
+                'portMappings': [
+                    {
+                        'containerPort':80,
+                        'hostPort':80,
+                        'protocol':'tcp'
+                    }
+                ],
+                'entryPoint':[
+                    "/tmp/home/start.sh"
+                ],
+                'mountPoints':[
+                    {
+                        'sourceVolume':'lpp',
+                        'containerPath':'/tmp/home'
+                    }
+                ],
+                'logConfiguration':{
+                    'logDriver':'awslogs',
+                    'options':{
+                        "awslogs-group": "/ecs/ecsTask",
+                        "awslogs-region": region,
+                        "awslogs-stream-prefix": "ecs"
+                    }
+                }
+            },
+            {
+                'name':'container2',
+                'image':container_uri,
+                'essential':False,
+                'portMappings': [
+                    {
+                        'containerPort':81,
+                        'hostPort':81,
+                        'protocol':'tcp'
+                    }
+                ],
+                'entryPoint':[
+                    "python"
+                ],
+                'command':[
+                    "yaml_parser.py",
+                    "--yaml",
+                    "tempconfig.yaml"
+                ],
+                'dependsOn':[
+                    {
+                        'condition':"COMPLETE",
+                        'containerName':"container1"
+                    }
+                ],
+                'workingDirectory': "/tmp/home",
+                'mountPoints':[
+                    {
+                        'sourceVolume':'lpp',
+                        'containerPath':'/tmp/home'
+                    }
+                ],
+                'logConfiguration':{
+                    'logDriver':'awslogs',
+                    'options':{
+                        "awslogs-group": "/ecs/ecsTask",
+                        "awslogs-region": region,
+                        "awslogs-stream-prefix": "ecs"
+                    }
+                }
+            },
+            {
+                'name':'container3',
+                'image':constants.STARTER_STOPPER,
+                'essential':True,
+                'portMappings': [
+                    {
+                        'containerPort':82,
+                        'hostPort':82,
+                        'protocol':'tcp'
+                    }
+                ],
+                'entryPoint':[
+                    "/tmp/home/end.sh"
+                ],
+                'dependsOn':[
+                    {
+                        'condition':"COMPLETE",
+                        'containerName':"container2"
+                    }
+                ],
+                'mountPoints':[
+                    {
+                        'sourceVolume':'lpp',
+                        'containerPath':'/tmp/home'
+                    }
+                ],
+                'logConfiguration':{
+                    'logDriver':'awslogs',
+                    'options':{
+                        "awslogs-group": "/ecs/ecsTask",
+                        "awslogs-region": region,
+                        "awslogs-stream-prefix": "ecs"
+                    }
+                }
+            }
+        ],
+        volumes= [
+            {
+                "name": "lpp",
+                "host": {}
+            }
+        ]
+    )
+
+    return response['taskDefinition']['taskDefinitionArn']

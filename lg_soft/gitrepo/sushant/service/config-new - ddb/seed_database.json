@@ -1,0 +1,157 @@
+{
+  "paltform_modules": [],
+  "workflow_examples": [
+    {
+      "type": "moduleConfigVersion",
+      "id": 944354136,
+      "moduleConfig": "MetaData:\n  name: S3CSVDataLoader\n  description: Load CSV Data From S3\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: function\n  resource: ${context['step_execution']['resource_names'].output()['Payload']['S3CSVDataLoader']}\n\nDeployment:\n  ArtifactLocation: ~~S3_BASE_BUCKET_NAME~~\n  ArtifactName: DataValidator-dev-DataValidator-05da1c68-5915-4009-be08-40bf33dd0e01.zip\n  Memory: 1024\n  runTime: python3.6\n  layers: ~~LAYERS_NAME~~\n  handler: handler.main\n\ninputs:\n  FilePath: ${context['pipeline_execution']['BaseLocation']}\n  FileName: batch_data.csv\n  FileSourceType: S3\n  ContentType: text/csv\n  Encoding: UTF-8\n  Fields:\n    need:\n      - id\n      - diagnosis\n      - radius_mean\n      - texture_mean\n      - perimeter_mean\n      - area_mean\n      - smoothness_mean\n      - compactness_mean\n      - concavity_mean\n      - concave points_mean\n      - symmetry_mean\n      - fractal_dimension_mean\n      - radius_se\n      - texture_se\n      - perimeter_se\n      - area_se\n      - smoothness_se\n      - compactness_se\n      - concavity_se\n      - concave points_se\n      - symmetry_se\n      - fractal_dimension_se\n      - radius_worst\n      - texture_worst\n      - perimeter_worst\n      - area_worst\n      - smoothness_worst\n      - compactness_worst\n      - concavity_worst\n      - concave points_worst\n      - symmetry_worst\n  FieldValidations:\n    id:\n      type: integer\n      conditions:\n        - 'null'\n        - int\n      action: drop\n    diagnosis:\n      type: String\n      conditions:\n        - 'null'\n        - string\n      action: drop\n    radius_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    texture_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    perimeter_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    area_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    smoothness_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    compactness_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concavity_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concave points_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    symmetry_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    fractal_dimension_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    radius_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    texture_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    perimeter_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    area_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    smoothness_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    compactness_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concavity_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concave points_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    symmetry_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    fractal_dimension_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    radius_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    texture_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    perimeter_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    area_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    smoothness_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    compactness_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concavity_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concave points_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    symmetry_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\noutputs:\n  dest:\n    FileName: batch_data_cleansed\n    FileSourceType: S3\n    ContentType: Text/CSV\n    FilePath: ${context['pipeline_execution']['BaseLocation']}"
+    },
+    {
+      "type": "moduleConfigVersion",
+      "id": 944439433,
+      "moduleConfig": "MetaData:\n  name: CompareResults\n  description: Compare Results from Different Predictions\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: ecs\n  resource: arn:aws:lambda:ap-south-1:453383428584:function:DataValidator-dev-DataValidator\ndeployment:\n  ArtifactLocation: ~~S3_BASE_BUCKET_NAME~~\n  handler: handler.py\n  CPU: 256\n  Memory: 512\ninputs:\n  - FilePath: ${context['pipeline_execution']['BaseLocation']}/output1\n    FileName: batch_data_cleansed.out\n    FileSourceType: S3\n    ContentType: text/csv\n  - FilePath: ${context['pipeline_execution']['BaseLocation']}/output2\n    FileName: batch_data_cleansed.out\n    FileSourceType: S3\n    ContentType: text/csv\n\noutputs:\n  dest:\n    FileName: compared_results\n    FileSourceType: S3\n    ContentType: Text/CSV\n    FilePath: ${context['pipeline_execution']['BaseLocation']}"
+    },
+
+    {
+      "type": "moduleConfigVersion",
+      "id": 944383716,
+      "moduleConfig": "MetaData:\n  name: ParallelInferences\n  description: Do Batch Prediction\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: parallel\n\nModules:\n  BatchInference1:\n    ModuleId: 1598592292\n  BatchInference2:\n    ModuleId: 1598592293\n\ninputs:\n  Branch:\n    - Name: BatchInference1\n    - Name: BatchInference2"
+    },
+    {
+      "type": "moduleConfigVersion",
+      "id": 944476202,
+      "moduleConfig": "MetaData:\n  name: NotifyResults\n  description: Was the Prediction Successful?\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: choice\n\nModules:\n  NotifySuccess:\n    ModuleId: 1598592297\n  NotifyFailure:\n    ModuleId: 1598592296\n\ninputs:\n  - Condition:\n      Variable:  ${context['step_execution']['combineresults']}.output()['StatusCode']\n      Expression: NumericEquals\n      ExpressionValue: 200\n      Next: NotifySuccess\n  - Condition:\n      Variable:  ${context['step_execution']['combineresults']}.output()['StatusCode']\n      Expression: NumericEquals\n      ExpressionValue: 500\n      Next: NotifyFailure"
+    },
+    {
+      "type": "moduleConfigVersion",
+      "id": 1598592292,
+      "moduleConfig": "MetaData:\n  name: BatchInference1\n  description: Predict Result using model 1\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: batch_inference\ndeployment:\n  ArtifactLocation: https://~~S3_BASE_BUCKET_NAME~~.s3.ap-south-1.amazonaws.com/model.tar.gz\n  image: xgboost\n  model_name: ~~MODEL_NAME~~\n  instance_count: 1\ninputs:\n  FilePath: ${context['pipeline_execution']['BaseLocation']}/batch_data_cleansed\n  FileSourceType: S3\n  ContentType: text/csv\n\noutputs:\n  dest:\n    FileName: batch_data_cleansed\n    FileSourceType: S3\n    ContentType: Text/CSV\n    FilePath: ${context['pipeline_execution']['BaseLocation']}/output1"
+    },
+    {
+      "type": "moduleConfigVersion",
+      "id": 1598592293,
+      "moduleConfig": "MetaData:\n  name: BatchInference2\n  description: Predict Result using model 2\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: batch_inference\ndeployment:\n  ArtifactLocation: https://~~S3_BASE_BUCKET_NAME~~.s3.ap-south-1.amazonaws.com/model.tar.gz\n  image: xgboost\n  model_name: ~~MODEL_NAME~~\n  instance_count: 1\ninputs:\n  FilePath: ${context['pipeline_execution']['BaseLocation']}/batch_data_cleansed\n  FileSourceType: S3\n  ContentType: text/csv\n\noutputs:\n  dest:\n    FileName: batch_data_cleansed\n    FileSourceType: S3\n    ContentType: Text/CSV\n    FilePath: ${context['pipeline_execution']['BaseLocation']}/output2"
+    },
+    {
+      "type": "moduleConfigVersion",
+      "id": 1598592296,
+      "moduleConfig": "MetaData:\n  name: NotifyFailure\n  description: Send a Failure Notification\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: notify_email\ndeployment:\n  TopicArn: ${context['pipeline_execution']['NotificationArn']}\ninputs:\n  Message: Inference Pipeline was a failure."
+    },
+    {
+      "type": "moduleConfigVersion",
+      "id": 1598592297,
+      "moduleConfig": "MetaData:\n  name: NotifySuccess\n  description: Send a Success Notification\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: notify_email\ndeployment:\n  TopicArn: ${context['pipeline_execution']['NotificationArn']}\ninputs:\n  Message: Inference Pipeline was successful."
+    },
+    {
+      "type": "moduleConfigVersion",
+      "id": 1598944227,
+      "moduleConfig": "MetaData:\n  name: BatchInference1\n  description: Predict Result using Model\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: batch_inference\ndeployment:\n  ArtifactLocation: https://~~S3_BASE_BUCKET_NAME~~.s3.ap-south-1.amazonaws.com/model.tar.gz\n  image: xgboost\n  model_name: ~~MODEL_NAME~~\n  instance_count: 1\ninputs:\n  FilePath: ${context['pipeline_execution']['BaseLocation']}/batch_data_cleansed\n  FileSourceType: S3\n  ContentType: text/csv\n\noutputs:\n  dest:\n    FileName: batch_data_cleansed\n    FileSourceType: S3\n    ContentType: Text/CSV\n    FilePath: ${context['pipeline_execution']['BaseLocation']}/output1"
+    },{
+      "createdAt": "2020-07-14T05:47:09.302Z",
+      "type": "workflowVersion",
+      "id": 123456789,
+      "moduleConfig": "MetaData:\n  config: default\n  description: LG Demo Workflow\n  name: LGDemo\n  team: Data Science\n  type: BatchInferencePipeline\n  version: 2020-08\nModules:\n  Inference:\n    Location:\n      x: 461\n      'y': 284\n    ModuleId: 1598944227\n  dataload:\n    Location:\n      x: 221\n      'y': 375\n    ModuleId: 944354136\n  notify:\n    Location:\n      x: 938\n      'y': 127\n    ModuleId: 944476202\nSteps:\n  Inference:\n    Next: notify\n  dataload:\n    Next: Inference\n    Start: 'True'\n  notify:\n    End: 'True'\ngeneral:\n  debug: 'yes'\n  level: 1\n  log:\n    - dest:\n        FilePath: 's3://sagemaker-mlops-demo-lg-jul-2020'\n        FileSourceType: S3",
+      "parent": 1596457794,
+      "updatedAt": "2020-09-02T13:23:25.406Z",
+      "userName": "admin",
+      "userRole": "Administrator",
+      "workflowVersionDescription": "Lambda -> Parallel --> ECS --> Choice",
+      "workflowVersionName": "Demo4"
+    },{
+      "createdAt": "2020-07-14T05:47:09.302Z",
+      "type": "workflowVersion",
+      "id": 123456790,
+      "moduleConfig": "MetaData:\n  config: default\n  description: LG Demo Workflow\n  name: LGDemo\n  team: Data Science\n  type: BatchInferencePipeline\n  version: 2020-08\nModules:\n  ParallelInference:\n    Location:\n      x: 461\n      'y': 284\n    ModuleId: 944383716\n  dataload:\n    Location:\n      x: 221\n      'y': 375\n    ModuleId: 944354136\n  notify:\n    Location:\n      x: 938\n      'y': 127\n    ModuleId: 944476202\n  DataCompare:\n    ModuleId: 944439433\nSteps:\n  ParallelInference:\n    Next: DataCompare\n  dataload:\n    Next: ParallelInference\n    Start: 'True'\n  DataCompare:\n    Next: notify\n  notify:\n    End: 'True'\ngeneral:\n  debug: 'yes'\n  level: 1\n  log:\n    - dest:\n        FilePath: 's3://sagemaker-mlops-demo-lg-jul-2020'\n        FileSourceType: S3",
+      "parent": 1596457794,
+      "updatedAt": "2020-09-02T13:23:25.406Z",
+      "userName": "admin",
+      "userRole": "Administrator",
+      "workflowVersionDescription": "Lambda -> Sagemaker --> ECS --> Choice",
+      "workflowVersionName": "Demo4"
+
+    },{
+      "createdAt": "2020-07-14T05:47:09.302Z",
+      "type": "platformModule",
+      "id": 1594704932,
+      "moduleConfig": "MetaData:\n  name: S3CSVDataLoader\n  description: Load CSV Data From S3\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: function\n  resource: ${context['step_execution']['resource_names'].output()['Payload']['S3CSVDataLoader']}\n\nDeployment:\n  ArtifactLocation: ~~S3_BASE_BUCKET_NAME~~\n  ArtifactName: DataValidator-dev-DataValidator-05da1c68-5915-4009-be08-40bf33dd0e01.zip\n  Memory: 1024\n  runTime: python3.6\n  layers: ~~LAYERS_NAME~~\n  handler: handler.main\n\ninputs:\n  FilePath: ${context['pipeline_execution']['BaseLocation']}\n  FileName: batch_data.csv\n  FileSourceType: S3\n  ContentType: text/csv\n  Encoding: UTF-8\n  Fields:\n    need:\n      - id\n      - diagnosis\n      - radius_mean\n      - texture_mean\n      - perimeter_mean\n      - area_mean\n      - smoothness_mean\n      - compactness_mean\n      - concavity_mean\n      - concave points_mean\n      - symmetry_mean\n      - fractal_dimension_mean\n      - radius_se\n      - texture_se\n      - perimeter_se\n      - area_se\n      - smoothness_se\n      - compactness_se\n      - concavity_se\n      - concave points_se\n      - symmetry_se\n      - fractal_dimension_se\n      - radius_worst\n      - texture_worst\n      - perimeter_worst\n      - area_worst\n      - smoothness_worst\n      - compactness_worst\n      - concavity_worst\n      - concave points_worst\n      - symmetry_worst\n  FieldValidations:\n    id:\n      type: integer\n      conditions:\n        - 'null'\n        - int\n      action: drop\n    diagnosis:\n      type: String\n      conditions:\n        - 'null'\n        - string\n      action: drop\n    radius_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    texture_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    perimeter_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    area_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    smoothness_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    compactness_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concavity_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concave points_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    symmetry_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    fractal_dimension_mean:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    radius_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    texture_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    perimeter_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    area_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    smoothness_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    compactness_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concavity_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concave points_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    symmetry_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    fractal_dimension_se:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    radius_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    texture_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    perimeter_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    area_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    smoothness_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    compactness_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concavity_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    concave points_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\n    symmetry_worst:\n      type: integer\n      conditions:\n        - 'null'\n      action: drop\noutputs:\n  dest:\n    FileName: batch_data_cleansed\n    FileSourceType: S3\n    ContentType: Text/CSV\n    FilePath: ${context['pipeline_execution']['BaseLocation']}",
+      "moduleDescription": "This is for data loader module",
+      "moduleName": "Data Loader",
+      "moduleRelease":  "v2020.07.14",
+      "parent": 0,
+      "updatedAt": "2020-07-14T05:47:09.302Z",
+      "userName": "admin",
+      "userRole": "Administrator"
+    },{
+      "createdAt": "2020-07-14T05:47:09.302Z",
+      "type": "platformModule",
+      "id": 1594704933,
+      "moduleConfig": "MetaData:\n  name: CompareResults\n  description: Compare Results from Different Predictions\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: ecs\n  resource: arn:aws:lambda:ap-south-1:453383428584:function:DataValidator-dev-DataValidator\ndeployment:\n  ArtifactLocation: ~~S3_BASE_BUCKET_NAME~~\n  handler: handler.py\n  CPU: 256\n  Memory: 512\ninputs:\n  - FilePath: ${context['pipeline_execution']['BaseLocation']}/output1\n    FileName: batch_data_cleansed.out\n    FileSourceType: S3\n    ContentType: text/csv\n  - FilePath: ${context['pipeline_execution']['BaseLocation']}/output2\n    FileName: batch_data_cleansed.out\n    FileSourceType: S3\n    ContentType: text/csv\n\noutputs:\n  dest:\n    FileName: compared_results\n    FileSourceType: S3\n    ContentType: Text/CSV\n    FilePath: ${context['pipeline_execution']['BaseLocation']}",
+      "moduleDescription": "This is ECS Module for Comparing Results",
+      "moduleName": "CompareResults",
+      "moduleRelease":  "v2020.07.14",
+      "parent": 0,
+      "updatedAt": "2020-07-14T05:47:09.302Z",
+      "userName": "admin",
+      "userRole": "Administrator"
+    },{
+      "createdAt": "2020-07-14T05:47:09.302Z",
+      "type": "platformModule",
+      "id": 1594704934,
+      "moduleConfig": "MetaData:\n  name: ParallelInferences\n  description: Do Batch Prediction\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: parallel\n\nModules:\n  BatchInference1:\n    ModuleId: 1598592292\n  BatchInference2:\n    ModuleId: 1598592293\n\ninputs:\n  Branch:\n    - Name: BatchInference1\n    - Name: BatchInference2",
+      "moduleDescription": "This is for Running Parallel Tasks",
+      "moduleName": "Parallel",
+      "moduleRelease":  "v2020.07.14",
+      "parent": 0,
+      "updatedAt": "2020-07-14T05:47:09.302Z",
+      "userName": "admin",
+      "userRole": "Administrator"
+    },{
+      "createdAt": "2020-07-14T05:47:09.302Z",
+      "type": "platformModule",
+      "id": 1594704935,
+      "moduleConfig": "MetaData:\n  name: NotifyResults\n  description: Was the Prediction Successful?\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: choice\n\nModules:\n  NotifySuccess:\n    ModuleId: 1598592297\n  NotifyFailure:\n    ModuleId: 1598592296\n\ninputs:\n  - Condition:\n      Variable:  ${context['step_execution']['combineresults']}.output()['StatusCode']\n      Expression: NumericEquals\n      ExpressionValue: 200\n      Next: NotifySuccess\n  - Condition:\n      Variable:  ${context['step_execution']['combineresults']}.output()['StatusCode']\n      Expression: NumericEquals\n      ExpressionValue: 500\n      Next: NotifyFailure",
+      "moduleDescription": "This is for Choice",
+      "moduleName": "Choice",
+      "moduleRelease":  "v2020.07.14",
+      "parent": 0,
+      "updatedAt": "2020-07-14T05:47:09.302Z",
+      "userName": "admin",
+      "userRole": "Administrator"
+    },{
+      "createdAt": "2020-07-14T05:47:09.302Z",
+      "type": "platformModule",
+      "id": 1594704936,
+      "moduleConfig": "MetaData:\n  name: NotifySuccess\n  description: Send a Success Notification\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: notify_email\ndeployment:\n  TopicArn: ${context['pipeline_execution']['NotificationArn']}\ninputs:\n  Message: Inference Pipeline was successful.",
+      "moduleDescription": "Notify",
+      "moduleName": "Notify Results",
+      "moduleRelease":  "v2020.07.14",
+      "parent": 0,
+      "updatedAt": "2020-07-14T05:47:09.302Z",
+      "userName": "admin",
+      "userRole": "Administrator"
+    },{
+      "createdAt": "2020-07-14T05:47:09.302Z",
+      "type": "platformModule",
+      "id": 1594704937,
+      "moduleConfig": "MetaData:\n  name: BatchInference1\n  description: Predict Result using Model\n  id: 123e4567-e89b-12d3-a456-426614174000\n  type: batch_inference\ndeployment:\n  ArtifactLocation: https://~~S3_BASE_BUCKET_NAME~~.s3.ap-south-1.amazonaws.com/model.tar.gz\n  image: xgboost\n  model_name: ~~MODEL_NAME~~\n  instance_count: 1\ninputs:\n  FilePath: ${context['pipeline_execution']['BaseLocation']}/batch_data_cleansed\n  FileSourceType: S3\n  ContentType: text/csv\n\noutputs:\n  dest:\n    FileName: batch_data_cleansed\n    FileSourceType: S3\n    ContentType: Text/CSV\n    FilePath: ${context['pipeline_execution']['BaseLocation']}/output1",
+      "moduleDescription": "SagemakerInference",
+      "moduleName": "PredictResults",
+      "moduleRelease":  "v2020.07.14",
+      "parent": 0,
+      "updatedAt": "2020-07-14T05:47:09.302Z",
+      "userName": "admin",
+      "userRole": "Administrator"
+    },{
+    "createdAt": "2020-07-14T05:47:09.302Z",
+      "id": 1596457794,
+      "parent": 0,
+      "type": "workflow",
+      "updatedAt": "2020-07-30T05:47:09.302Z",
+      "userName": "admin",
+      "userRole": "Administrator",
+      "workflowDescription": "Batch prediction workflow",
+      "workflowName": "CancerPredictionWorkflow",
+      "moduleConfig": "no data"
+    }
+  ]
+}

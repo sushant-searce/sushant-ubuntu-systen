@@ -1,0 +1,6 @@
+###### Requirements without Version Specifiers ######`
+nose
+nose-cov
+beautifulsoup4
+requests
+Flask==1.1.2

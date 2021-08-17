@@ -1,0 +1,43 @@
+metaData:
+  name: Glue Module
+  description: Glue Job
+  config: default
+  version: 1
+  team: NLP
+input:
+  source:
+    - filePath: s3://lppdatasource103424-devthree/public/DataLoad/Big_Data_Department/Big_Data_CI_Task/Inputs/input.txt
+      name: input.txt
+      srcType: S3
+      argName: inputfile
+      fileType: csv
+output:
+  dest:
+    - fileName: file_convert.parquet
+      srcType: S3
+      fileType: txt
+      filePath: s3://lppdatasource103424-devthree/public/DataLoad/Big_Data_Department/Big_Data_CI_Task/Outputs/Output_Location/bacf789c-2584-4abb-a9b9-5b58cf17f5ea_output.txt
+      argName: outputfile
+      name: bacf789c-2584-4abb-a9b9-5b58cf17f5ea_output.txt
+functional:
+  process:
+    function_parameter:
+      dataType: string
+      value: <value>
+
+deployment:
+  type: glue
+  config:
+    jobType: gluejob        #  gluejob | mysql_to_mysql | mysql_to_s3
+    dbName: database_name
+    crawlerName: crawler_name
+    dataTarget: s3 path of data
+    jobName: lgSearceGlueAddJob
+    jobVersion: v1
+    jobMaxCapacity: 10
+    jobTimeout: 60
+    jobExecuteType: glueetl
+general:
+  debug: no
+  level: 1
+  scriptFile: mysqlgluescript.py

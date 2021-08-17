@@ -1,0 +1,24 @@
+functional:
+  process:
+    input_content_type:
+      dataType: string
+      value: application/x-image   
+    input_split_type:
+      dataType: string
+      value: None
+    output_assemble_with:
+      dataType: string
+      value: None
+    output_accept:
+      dataType: string
+      value: None
+deployment:
+  type: batch_inference
+  config:
+    framework: pytorch              # pytorch | tensorflow | xgboost | chainer | scikit_learn | mx_net
+    instance_count: 1               # Instance count
+    instance_type: ml.p2.xlarge     # Instance Type 
+general:
+  debug: no
+  level: 1
+  scriptFile: inference.py           # Inference script name

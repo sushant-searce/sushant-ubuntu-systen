@@ -1,0 +1,7 @@
+troposphere
+boto3==1.14.19
+Flask==1.1.2
+punq==0.4.1
+sagemaker==1.72.0
+PyYAML==5.3.1
+ipython

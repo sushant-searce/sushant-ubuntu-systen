@@ -1,0 +1,27 @@
+MetaData:
+  name: CompareResults
+  description: Compare Results from Different Predictions
+  id: 123e4567-e89b-12d3-a456-426614174000
+  type: ecs
+  resource: arn:aws:lambda:ap-south-1:453383428584:function:DataValidator-dev-DataValidator
+deployment:
+  ArtifactLocation: sagemaker-mlops-demo-lg-jul-2020
+  handler: handler.py
+  CPU: 256
+  Memory: 512
+inputs:
+  - FilePath: s3://sagemaker-mlops-demo-lg-jul-2020/output1
+    FileName: batch_data_cleansed.csv.out
+    FileSourceType: S3
+    ContentType: text/csv
+  - FilePath: s3://sagemaker-mlops-demo-lg-jul-2020/output2
+    FileName: batch_data_cleansed.csv.out
+    FileSourceType: S3
+    ContentType: text/csv
+
+outputs:
+  dest:
+    FileName: compared_results
+    FileSourceType: S3
+    ContentType: Text/CSV
+    FilePath: s3://sagemaker-mlops-demo-lg-jul-2020

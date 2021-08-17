@@ -1,0 +1,49 @@
+metaData:
+  name: BatchInferencetensorflow
+  description: tensorflow Sagemaker Model
+  config: default
+  version: 1.0
+  team: "NLP" 
+
+functional:
+  process:
+    input_content_type:
+      dataType: string
+      value: application/x-image
+    input_split_type:
+      dataType: string
+      value: None
+    output_assemble_with:
+      dataType: string
+      value: None
+    output_accept:
+      dataType: string
+      value: None
+
+deployment:
+  type: batch_inference
+  config:
+    # image: 475088953585.dkr.ecr.ap-southeast-1.amazonaws.com/sagemaker-xgboost:1.0-1-cpu-py3
+    framework: tensorflow        # pytorch | tensorflow | xgboost | chainer | scikit_learn | mx_net
+    model_name: template-model-tensorflow
+    instance_count: 1
+    instance_type: ml.p2.xlarge   # https://aws.amazon.com/sagemaker/pricing/
+
+input:
+  source:                                           # multiple sources could be present
+    - filePath: 's3://testing-input-output-bucket/input/'   # file path - folder path
+      name: "tripdata.csv"                              # file name
+      srcType: S3                                # possibe values - s3 | local | MySQL
+      type: python                                # possibe values - python | scala | jar
+      argName: "inputfile"
+
+output:
+  dest:
+    - fileName: xgboost_convert
+      fileSourceType: S3
+      contentType: Text/CSV/parquet
+      filePath: ss3://testing-input-output-bucket/output
+general:
+  debug: no
+  level: 1
+  scriptFile: inference.py

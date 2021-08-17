@@ -1,0 +1,23 @@
+deployments:
+  - type: function
+    config:
+      Name: DataValidator
+      S3Location: sagemaker-mlops-demo-lg-jul-2020
+      artifactName: DataValidator-dev-DataValidator-05da1c68-5915-4009-be08-40bf33dd0e01.zip
+      MemorySize: 1024
+      runTime: python3.6
+      layers: aws-data-wrangler
+      handler: handler.main
+  - type: model
+    config:
+        Name: BreastCancerPrediction
+        ArtifactLocation: https://sagemaker-mlops-demo-lg-jul-2020.s3.ap-south-1.amazonaws.com/model.tar.gz
+        image: xgboost
+        model_name: XGBOOST-BreastCancerPrediction
+        instance_count: 1
+  - type: ecs
+    config:
+      ArtifactLocation: sagemaker-mlops-demo-lg-jul-2020
+      handler: handler.py
+      CPU: 256
+      Memory: 512

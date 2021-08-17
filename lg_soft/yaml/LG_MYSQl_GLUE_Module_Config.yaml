@@ -1,0 +1,78 @@
+metaData:
+  name: "Glue Module"
+  description: "Glue Job"
+  config: default
+  version: 1.0
+  team: "NLP"
+input:
+  source:
+    - filePath: 's3://lppdatasource103424-devthree/'
+      name: "batch_data_cleansed.csv" 
+      srcType: S3     
+      argName: "inputfile"
+      fileType: csv  
+output:
+  dest:
+    - fileName: file_convert.parquet
+      srcType: S3
+      fileType: txt
+      filePath: s3://testing-input-output-bucket/output-glue
+      argName: outputfile 
+functional:
+  process:
+    mysql_source_endpoint:
+      dataType: string
+      value: glue-database.c9zobpcmtbei.ap-southeast-1.rds.amazonaws.com
+    mysql_source_port:
+      dataType: string
+      value: 3306
+    mysql_source_host_username:
+      dataType: string
+      value: admin
+    mysql_source_host_password:
+      dataType: string
+      value: password
+    source_database:
+      dataType: string
+      value: source
+    source_table:
+      dataType: string
+      value: employee
+    mysql_destination_endpoint:
+      dataType: string
+      value: glue-database.c9zobpcmtbei.ap-southeast-1.rds.amazonaws.com
+    mysql_destination_port:
+      dataType: string
+      value: 3306
+    mysql_destination_host_username:
+      dataType: string
+      value: admin
+    mysql_destination_host_password:
+      dataType: string
+      value: password
+    destination_database:
+      dataType: string
+      value: dest
+    destination_table:
+      dataType: string
+      value: employee_test
+    s3_path_to_store_data:
+      dataType: string
+      value: s3://testing-input-output-bucket/temp/
+deployment: 
+  type: glue
+  config:  
+    jobType: mysql_to_mysql                    #mysql_to_mysql | mysql_to_s3 | gluejob 
+    dbName: database_name                      #future deployment  
+    crawlerName: crawler_name                  #future deployment  
+    dataTarget: s3 path of data                #future deployment  
+    jobName: lgSearceGlueAddJob                 
+    jobVersion : v1
+    jobMaxCapacity : 10
+    jobTimeout : 60
+    jobExecuteType : glueetl
+
+general:
+  debug: no
+  level: 1
+  scriptFile: mysqlgluescript.py

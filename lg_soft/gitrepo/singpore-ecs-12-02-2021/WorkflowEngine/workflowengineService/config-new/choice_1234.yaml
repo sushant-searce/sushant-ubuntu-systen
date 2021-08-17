@@ -1,0 +1,24 @@
+MetaData:
+  name: NotifyResults
+  description: Was the Prediction Successful?
+  id: 123e4567-e89b-12d3-a456-426614174000
+  type: choice
+
+Modules:
+  NotifySuccess:
+    ModuleId: notify_success
+  NotifyFailure:
+    ModuleId: notify_failure
+
+
+inputs:
+  - Condition:
+      Variable:  ${context['step_execution']['DataLoader']}.output()['StatusCode']
+      Expression: NumericEquals
+      ExpressionValue: 200
+      Next: NotifySuccess
+  - Condition:
+      Variable:  ${context['step_execution']['DataLoader']}.output()['StatusCode']
+      Expression: NumericEquals
+      ExpressionValue: 500
+      Next: NotifyFailure

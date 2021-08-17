@@ -1,0 +1,151 @@
+# Workflow Configuration
+# This configuration file will be used as the template by the end user to provide / edit the different configurations for the workflow
+
+# Date:04-12-2020
+#------------------------------------------------------------------------------------------------------------------------------
+# metadata includes the high level description of the workspace
+#------------------------------------------------------------------------------------------------------------------------------
+metaData:
+  name: "Workflow Name"                                     # name of the workflow
+  description: "Description about the Workflow"             # description of the workflow
+  config: default                                           # default or modified
+  version: 2.0                                              # corresponding config version
+  team: "Team name"                                         # creation team name
+
+#------------------------------------------------------------------------------------------------------------------------------
+# List of modules in the workflow as a list
+# The id parameter in this section is the unique identifier for the added module. Please not that this is not the module id
+# For example if a module is added more than once this id will be different each time to identify modules in workspace 
+# Actual moduleid is saved in DynamoDB
+#------------------------------------------------------------------------------------------------------------------------------
+modules:
+  module1:                     # Name of the module
+    location:
+      x: 187
+      y: 346
+    id: '1606800988'           #Unique identifier for the added module. This is not the module id. 
+  module2:
+    location:
+      x: 197
+      y: 356
+    id: '1606800989'
+  module3:
+    location:
+      x: 207
+      y: 366
+    id: '1606800990'
+  module4:
+    location:
+      x: 217
+      y: 376
+    id: '1606800991'
+  module5:
+    location:
+      x: 227
+      y: 386
+    id: '1606800992'
+
+#------------------------------------------------------------------------------------------------------------------------------
+# Indicate the workflow steps 
+# This section is for sequencing the modules 
+#------------------------------------------------------------------------------------------------------------------------------
+steps:
+  start: module1
+
+  module1:
+    type: dataTask              # to identify if it is a dataTask or  mlTask   or action               
+    skipModule: yes             # Incase the workflow terminates prematurely this paraameter is used to skip the already processed modules
+    saveOutput: yes
+    next: module2
+  
+  module2:
+    type: mlTask
+    skipModule: no
+    saveOutput: yes
+    next: parallelState
+  
+  parallelState:						#for parallel and choice user has to hardcode these state in workflow config
+    type: parallel						# in the UI as these state are not handeld by UI yet
+    branches:
+      - module3
+      - module4
+  
+ 
+  choiceState:
+    type: choice
+    conditions:
+      - variable:  ${context['step_execution']['<Parent module name>']}.output()['StatusCode']
+        expression: NumericEquals
+        expressionValue: 200
+        next: module4
+      - variable:  ${context['step_execution']['<Parent module name>']}.output()['StatusCode']
+        expression: NumericEquals
+        expressionValue: 500
+        next: module5
+  
+	# here we are considering the keyword StatusCode means the choiceState will take the next state depending on the success and failure 
+	# of previous state, 200 is used for the success and any other number for failure
+	# this type of scenerio is done when we have two choices only one for previous module or state fail and one for previous module or 
+        # state success
+
+  choiceState:
+    type: choice
+    conditions:
+      - variable:  ${context['step_execution']['<Parent module name>']}.output()['<your-variable>']
+        expression: StringEquals
+        expressionValue: A 
+        next: module3
+      - variable:  ${context['step_execution']['<Parent module name>']}.output()['<your-variable>']
+        expression: StringEquals
+        expressionValue: B
+        next: module4
+      - variable:  ${context['step_execution']['<Parent module name>']}.output()['<your-variable>']
+        expression: StringEquals
+        expressionValue: C
+        next: module5
+  
+  # this is for the scenerio where choice state selection is not on previous module success or fail, it depends on user which module to choose 
+  # from the given choices depending upon the status file written by previous or parent module. Here '<you_variable>' could be anything except 
+  # StatusCode. 
+  # Here the code will check the conditions according to the "expression"  and "expression values" are checked and when the condition satisfies the choicestate will proceed for that choice or next module state.
+  # in the backend the following expression are valid- 
+  #"NumericEquals","NumericGreaterThan","NumericLessThan","StringEquals","StringGreaterThan","StringLessThan"
+
+    
+  module3:
+    type: mlTask
+    skipModule: no
+    saveOutput: no
+    next: module5
+  module4:
+    type: mlTask
+    skipModule: no
+    saveOutput: no
+    next: module5
+  module5:
+    type: mlTask
+    skipModule: no
+    saveOutput: yes
+    end: "True"
+#------------------------------------------------------------------------------------------------------------------------------
+# output path/file selection
+# need to define all types of errors
+#------------------------------------------------------------------------------------------------------------------------------
+output:
+  log:
+    - dest:                     # sequence of destinations
+        path: filepath          # path specific to one destination
+
+
+  notification:
+    onSuccess:
+      - none
+    onFailure:
+      - email
+#------------------------------------------------------------------------------------------------------------------------------
+# includes some general configs
+# lile debug options for whole module, or even specific to modules
+general:
+  singleECSInstance: true | false # set to true if wanted to run all ec2 tasks in same team cluster ecs instance
+  debug: yes                    # debug to be enabled or not for the whole module
+  level: 1                      # debug level

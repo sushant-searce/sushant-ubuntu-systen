@@ -1,0 +1,88 @@
+<script type="text/javascript" src="require.js"></script>
+<link rel="stylesheet" type="text/css" href="https://do0of8uwbahzz.cloudfront.net/graph.css">
+<div id="graph-612" class="workflowgraph">
+    
+    <style>
+        .graph-legend ul {
+            list-style-type: none;
+            padding: 10px;
+            padding-left: 0;
+            margin: 0;
+            position: absolute;
+            top: 0;
+            background: transparent;
+        }
+
+        .graph-legend li {
+            margin-left: 10px;
+            display: inline-block;
+        }
+
+        .graph-legend li > div {
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+        }
+
+        .graph-legend .success { background-color: #2BD62E }
+        .graph-legend .failed { background-color: #DE322F }
+        .graph-legend .cancelled { background-color: #DDDDDD }
+        .graph-legend .in-progress { background-color: #53C9ED }
+        .graph-legend .caught-error { background-color: #FFA500 }
+    </style>
+    <div class="graph-legend">
+        <ul>
+            <li>
+                <div class="success"></div>
+                <span>Success</span>
+            </li>
+            <li>
+                <div class="failed"></div>
+                <span>Failed</span>
+            </li>
+            <li>
+                <div class="cancelled"></div>
+                <span>Cancelled</span>
+            </li>
+            <li>
+                <div class="in-progress"></div>
+                <span>In Progress</span>
+            </li>
+            <li>
+                <div class="caught-error"></div>
+                <span>Caught Error</span>
+            </li>
+        </ul>
+    </div>
+
+    <svg></svg>
+    <a href="https://console.aws.amazon.com/states/home?region=ap-south-1#/executions/details/arn:aws:states:ap-south-1:453383428584:execution:InferencePipeline-4:088e1caf-abb7-47b1-b213-84f6f860720a" target="_blank"> Inspect in AWS Step Functions </a>
+</div>
+
+<script type="text/javascript">
+
+require.config({
+    paths: {
+        sfn: "https://do0of8uwbahzz.cloudfront.net/sfn",
+    }
+});
+
+require(['sfn'], function(sfn) {
+    var element = document.getElementById('graph-612')
+
+    var options = {
+        width: parseFloat(getComputedStyle(element, null).width.replace("px", "")),
+        height: 1000,
+        layout: 'LR',
+        resizeHeight: true
+    };
+
+    var definition = {"StartAt": "Data Loader", "States": {"Data Loader": {"Parameters": {"FunctionName": "arn:aws:lambda:ap-south-1:453383428584:function:DataValidator-dev-DataValidator", "Payload": {"input": "CSV File Location"}}, "Resource": "arn:aws:states:::lambda:invoke", "Type": "Task", "Next": "Parallel Batch Inference"}, "Parallel Batch Inference": {"Type": "Parallel", "Next": "Was Data Transformation Successful?", "Branches": [{"StartAt": "Classify Data-Algorithm 1", "States": {"Classify Data-Algorithm 1": {"Resource": "arn:aws:states:::sagemaker:createTransformJob.sync", "Parameters": {"TransformJobName": "serial-inference-batch-4", "ModelName": "XGBOOST-BreastCancerPrediction", "TransformInput": {"DataSource": {"S3DataSource": {"S3DataType": "S3Prefix", "S3Uri": "s3://sagemaker-mlops-demo-lg-jul-2020/batch_data.csv"}}, "ContentType": "text/csv", "SplitType": "Line"}, "TransformOutput": {"S3OutputPath": "s3://sagemaker-mlops-demo-lg-jul-2020/output", "AssembleWith": "Line", "Accept": "text/csv"}, "TransformResources": {"InstanceCount": 1, "InstanceType": "ml.m5.xlarge"}, "DataProcessing": {"InputFilter": "$[1:]"}, "BatchStrategy": "SingleRecord", "MaxPayloadInMB": 40}, "Type": "Task", "End": true}}}, {"StartAt": "Classify Data -Algorithm 2", "States": {"Classify Data -Algorithm 2": {"Resource": "arn:aws:states:::sagemaker:createTransformJob.sync", "Parameters": {"TransformJobName": "serial-inference-batch-5", "ModelName": "XGBOOST-BreastCancerPrediction", "TransformInput": {"DataSource": {"S3DataSource": {"S3DataType": "S3Prefix", "S3Uri": "s3://sagemaker-mlops-demo-lg-jul-2020/batch_data.csv"}}, "ContentType": "text/csv", "SplitType": "Line"}, "TransformOutput": {"S3OutputPath": "s3://sagemaker-mlops-demo-lg-jul-2020/output", "AssembleWith": "Line", "Accept": "text/csv"}, "TransformResources": {"InstanceCount": 1, "InstanceType": "ml.m5.xlarge"}, "DataProcessing": {"InputFilter": "$[1:]"}, "BatchStrategy": "SingleRecord", "MaxPayloadInMB": 40}, "Type": "Task", "End": true}}}]}, "Was Data Transformation Successful?": {"Type": "Choice", "Choices": [{"Variable": "$['TransformJobStatus']", "StringEquals": "Completed", "Next": "Notify Success"}]}, "Notify Success": {"Type": "Succeed"}}};
+    var elementId = '#graph-612';
+    var events = { 'events': [{"timestamp": 1597540033.915, "type": "ExecutionStarted", "id": 1, "previousEventId": 0, "executionStartedEventDetails": {"input": "{}", "roleArn": "arn:aws:iam::453383428584:role/StepFunctionsWorkflowExecutionRole"}}, {"timestamp": 1597540033.938, "type": "TaskStateEntered", "id": 2, "previousEventId": 0, "stateEnteredEventDetails": {"name": "Data Loader", "input": "{}"}}, {"timestamp": 1597540033.938, "type": "TaskScheduled", "id": 3, "previousEventId": 2, "taskScheduledEventDetails": {"resourceType": "lambda", "resource": "invoke", "region": "ap-south-1", "parameters": "{\"FunctionName\":\"arn:aws:lambda:us-east-1:296528901143:function:DataValidator\",\"Payload\":{\"input\":\"CSV File Location\"}}"}}, {"timestamp": 1597540033.964, "type": "TaskStarted", "id": 4, "previousEventId": 3, "taskStartedEventDetails": {"resourceType": "lambda", "resource": "invoke"}}, {"timestamp": 1597540033.998, "type": "TaskFailed", "id": 5, "previousEventId": 4, "taskFailedEventDetails": {"resourceType": "lambda", "resource": "invoke", "error": "Lambda.ResourceNotFoundException", "cause": "Functions from 'us-east-1' are not reachable in this region ('ap-south-1') (Service: AWSLambda; Status Code: 404; Error Code: ResourceNotFoundException; Request ID: 57cb25a1-8acb-4681-be4f-b98754c892ed; Proxy: null)"}}, {"timestamp": 1597540033.998, "type": "ExecutionFailed", "id": 6, "previousEventId": 5, "executionFailedEventDetails": {"error": "Lambda.ResourceNotFoundException", "cause": "Functions from 'us-east-1' are not reachable in this region ('ap-south-1') (Service: AWSLambda; Status Code: 404; Error Code: ResourceNotFoundException; Request ID: 57cb25a1-8acb-4681-be4f-b98754c892ed; Proxy: null)"}}] };
+
+    var graph = new sfn.StateMachineExecutionGraph(definition, events, elementId, options);
+    graph.render();
+});
+
+</script>

@@ -1,0 +1,218 @@
+MetaData:
+  name: S3CSVDataLoader
+  description: Load CSV Data From S3
+  id: 123e4567-e89b-12d3-a456-426614174000
+  type: function
+  resource: ${context['step_execution']['resource_names'].output()['Payload']['DataValidator']}
+
+Deployment:
+  ArtifactLocation: sagemaker-mlops-demo-lg-jul-2020
+  ArtifactName: DataValidator-dev-DataValidator-05da1c68-5915-4009-be08-40bf33dd0e01.zip
+  Memory: 1024
+  runTime: python3.6
+  layers: aws-data-wrangler
+  handler: handler.main
+
+inputs:
+  FilePath: s3://sagemaker-mlops-demo-lg-jul-2020
+  FileName: batch_data.csv
+  FileSourceType: S3
+  ContentType: text/csv
+  Encoding: UTF-8
+  Fields:
+    need:
+      - id
+      - diagnosis
+      - radius_mean
+      - texture_mean
+      - perimeter_mean
+      - area_mean
+      - smoothness_mean
+      - compactness_mean
+      - concavity_mean
+      - concave points_mean
+      - symmetry_mean
+      - fractal_dimension_mean
+      - radius_se
+      - texture_se
+      - perimeter_se
+      - area_se
+      - smoothness_se
+      - compactness_se
+      - concavity_se
+      - concave points_se
+      - symmetry_se
+      - fractal_dimension_se
+      - radius_worst
+      - texture_worst
+      - perimeter_worst
+      - area_worst
+      - smoothness_worst
+      - compactness_worst
+      - concavity_worst
+      - concave points_worst
+      - symmetry_worst
+  FieldValidations:
+    id:
+      type: integer
+      conditions:
+        - 'null'
+        - int
+      action: drop
+    diagnosis:
+      type: String
+      conditions:
+        - 'null'
+        - string
+      action: drop
+    radius_mean:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    texture_mean:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    perimeter_mean:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    area_mean:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    smoothness_mean:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    compactness_mean:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    concavity_mean:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    concave points_mean:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    symmetry_mean:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    fractal_dimension_mean:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    radius_se:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    texture_se:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    perimeter_se:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    area_se:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    smoothness_se:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    compactness_se:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    concavity_se:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    concave points_se:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    symmetry_se:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    fractal_dimension_se:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    radius_worst:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    texture_worst:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    perimeter_worst:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    area_worst:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    smoothness_worst:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    compactness_worst:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    concavity_worst:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    concave points_worst:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+    symmetry_worst:
+      type: integer
+      conditions:
+        - 'null'
+      action: drop
+outputs:
+  dest:
+    FileName: batch_data_cleansed
+    FileSourceType: S3
+    ContentType: Text/CSV
+    FilePath: s3://sagemaker-mlops-demo-lg-jul-2020
