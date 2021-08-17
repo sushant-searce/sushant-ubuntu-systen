@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: airflow-kubes-pod
+  name: airflow-kubes-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-kubes-pod
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: airflow-kubes-pod
+    spec:
+      dnsPolicy: Default
+      serviceAccountName: default
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: gcs-key
+      containers:
+      - image: 232383674343.dkr.ecr.us-east-1.amazonaws.com/fyusion-testing-repo:v1
+        name: airflow-app
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
+        resources: {}
+        securityContext:
+            privileged: true
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+            postStart:
+              exec:
+                command: ["gcsfuse", "-o", "nonempty", "sushant-fyusion-testing", "/usr/local/airflow/dags"]
+            preStop:
+              exec:
+                command: ["fusermount", "-u", "/usr/local/airflow/dags"]

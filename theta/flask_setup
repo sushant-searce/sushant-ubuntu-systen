@@ -1,0 +1,51 @@
+python3 --version	
+		Python 3.5.2
+
+sudo apt-get install python3-dev
+
+sudo apt-get update
+
+sudo apt-get install python3-pip
+
+sudo apt-get install virtualenv python-pip python3-dev
+
+pip3 install --upgrade pip setuptools
+
+python3 -m venv venvs/flaskproj
+
+source ~/venvs/flaskproj/bin/activate
+
+pip install flask gunicorn
+
+mkdir ~/flaskproj
+
+cd ~/flaskproj
+
+vim __init__.py
+
+			"""
+					from flask import Flask, Response
+
+
+					app = Flask(__name__)
+
+					@app.route("/")
+					def index():
+						return Response("It works!"), 200
+
+					if __name__ == "__main__":
+						app.run(debug=True)
+						
+			"""
+			
+cd ..
+
+
+export FLASK_APP=__init__.py
+
+flask run --host=0.0.0.0
+
+curl localhost:5000
+
+curl 0.0.0.0:5000
+
